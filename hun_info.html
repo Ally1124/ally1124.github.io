@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flight Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #003366, #66ccff);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            color: white;
+            margin: 0;
+            padding: 5px;
+        }
+
+        #container {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .section {
+            margin: 5px 0;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+            padding: 5px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        select, input[type="submit"] {
+            padding: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #0066cc;
+            color: white;
+            cursor: pointer;
+            margin: 3px;
+            width: calc(100% - 10px);
+        }
+
+        input[type="submit"]:hover {
+            background-color: #005bb5;
+        }
+
+        #stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 0.2;
+            }
+        }
+
+        .menu-header {
+            cursor: pointer;
+            padding: 5px;
+            background-color: #005bb5;
+            border-radius: 5px;
+            margin: 3px 0;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-content {
+            display: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .phone-number {
+            margin: 2px 0;
+        }
+
+        .menu-header img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="stars"></div>
+    <div id="container">
+        <!-- Flight Look Up Section -->
+        <div class="section">
+            <h2>Search for a Flight</h2>
+            <form id="flightForm" onsubmit="searchFlight(); return false;">
+                <input type="text" id="flightNumber" placeholder="Enter flight number">
+                <select id="searchOption">
+                    <option value="flightaware">FlightAware</option>
+                    <option value="flightradar24">FlightRadar24</option>
+                </select>
+                <input type="submit" value="Search">
+            </form>
+        </div>
+
+        <!-- Phone Numbers Section -->
+        <div class="section">
+            <h2>Phone Numbers</h2>
+            <div class="menu-header" onclick="toggleMenu('gatesContent')">
+                Gates
+            </div>
+            <div class="menu-content" id="gatesContent">
+                <div class="phone-number">Terminal A: 46978429XX (XX = Gate Number)</div>
+                <div class="phone-number">Terminal B: 46978487XX (XX = Gate Number)</div>
+                <div class="phone-number">Terminal C: 46978459XX (XX = Gate Number)</div>
+                <div class="phone-number">Terminal D: 46978449XX (XX = Gate Number)</div>
+            </div>
+
+            <div class="menu-header" onclick="toggleMenu('hccContent')">
+                HCC
+            </div>
+            <div class="menu-content" id="hccContent">
+                <div class="phone-number">MOD: 469-784-5000</div>
+                <div class="phone-number">CSM: 469-784-5050</div>
+                <div class="phone-number">Zone 1 (A8 - A17): 469-784-5001</div>
+                <div class="phone-number">Zone 2 (A18 - A28): 469-784-5002</div>
+                <div class="phone-number">Zone 3 (A29 - A39): 469-784-5003</div>
+                <div class="phone-number">Zone 4 (C2 - C15): 469-784-5004</div>
+                <div class="phone-number">Zone 5 (C16 - C26): 469-784-5005</div>
+                <div class="phone-number">Zone 6 (C27 - C39): 469-784-5006</div>
+                <div class="phone-number">Zone 7 (D1 - D25): 469-784-5007</div>
+                <div class="phone-number">Zone 8 (D25 - D40): 469-784-5008</div>
+                <div class="phone-number">Zone 9 (B5 - B12): 469-784-5009</div>
+                <div class="phone-number">Terminal A Gate Coord.: 469-784-5041</div>
+                <div class="phone-number">Terminal C Gate Coord.: 469-784-5042</div>
+                <div class="phone-number">Terminal D-B Gate Coord.: 469-784-5043</div>
+                <div class="phone-number">Move Coordinator: 469-784-5045</div>
+                <div class="phone-number">Company Radio: 469-784-5011</div>
+                <div class="phone-number">Seasonal/Deice Coord.: 469-784-5056</div>
+                <div class="phone-number">A/C Maintenance (TOCC): 469-784-5031</div>
+                <div class="phone-number">Flight Service Duty Manager: 469-784-5204</div>
+                <div class="phone-number">Crew Tracking Supervisor: 469-784-5074</div>
+                <div class="phone-number">POC: 469-784-5061</div>
+                <div class="phone-number">LSG Sky Chefs: 469-784-5102</div>
+                <div class="phone-number">LSG Sky Chefs Supervisor: 469-784-5108</div>
+                <div class="phone-number">ABM - Cabin Cleaning (Dom.): 469-784-5156</div>
+                <div class="phone-number">ABM - Cabin Cleaning (Intl.): 469-784-5157</div>
+                <div class="phone-number">Allied Aviation Fueling: 469-784-5141</div>
+                <div class="phone-number">Jim Kriksciun HCC M.D.: 469-784-5070</div>
+                <div class="phone-number">Johannes Jayasuriya HCC Sr. Mgr: 469-784-5071, 469-784-5072</div>
+                <div class="phone-number">Lori Butler HCC VC relief / Admin Mgr: 469-784-5073, 469-784-5299</div>
+            </div>
+
+            <div class="menu-header" onclick="toggleMenu('abrContent')">
+                ABR
+            </div>
+            <div class="menu-content" id="abrContent">
+                <div class="phone-number">Baggage Perf. CSM: 469-784-4466</div>
+                <div class="phone-number">MBR Bag Control: 469-784-5354</div>
+                <div class="phone-number">Outbound A @ A ABR: 469-784-3179 / 3180</div>
+                <div class="phone-number">Inbound A @ C ABR: 469-784-5356</div>
+                <div class="phone-number">Inbound C @ C ABR: 469-784-5352</div>
+                <div class="phone-number">Reroutes: 469-784-5352</div>
+            </div>
+
+            <div class="menu-header" onclick="toggleMenu('otherContent')">
+                Other
+            </div>
+            <div class="menu-content" id="otherContent">
+                <div class="phone-number">Clean/Spill A: 469-853-5551</div>
+                <div class="phone-number">Clean/Spill B: 972-973-3112</div>
+                <div class="phone-number">Clean/Spill C: 469-853-5551</div>
+                <div class="phone-number">Clean/Spill D: 972-973-3112</div>
+                <div class="phone-number">Clean/Spill E: 972-973-3112</div>
+                <div class="phone-number">Facilities Supervisor: 469-784-3199</div>
+            </div>
+
+            <div class="menu-header" onclick="toggleMenu('unionContent')">
+                Union Contacts
+            </div>
+            <div class="menu-content" id="unionContent">
+                <div class="phone-number">Union Helpdesk: 1-800-888-8888</div>
+                <div class="phone-number">Union Office: 1-800-999-9999</div>
+            </div>
+        </div>
+
+        <!-- Union Information Section -->
+        <div class="section">
+            <h2>Union Information</h2>
+            <p>test1234</p>
+            <p><a href="https://spteam.aa.com/sites/DFWROC/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FDFWROC%2FShared%20Documents%2FTWU%2FFleet%20Service%20JCBA%20TA%20final%203%2D9%2D2020%2Epdf&parent=%2Fsites%2FDFWROC%2FShared%20Documents%2FTWU" target="_blank" style="color: #66ccff;">Union Contract</a></p>
+        </div>
+
+        <!-- Links Section -->
+        <div class="section">
+            <h2>Links</h2>
+            <div>
+                <a href="https://prime.app.bags.aa.com" target="_blank" style="color: #66ccff;">PRIME</a><br>
+                <a href="https://falcon.app.bags.aa.com" target="_blank" style="color: #66ccff;">FALCON</a><br>
+                <a href="https://get.aa.com" target="_blank" style="color: #66ccff;">GET</a><br>
+                <a href="https://disp.aa.com" target="_blank" style="color: #66ccff;">DISPATCH</a><br>
+                <a href="https://webmail.aa.com" target="_blank" style="color: #66ccff;">EMAIL</a><br>
+                <a href="https://webreff.aa.com" target="_blank" style="color: #66ccff;">WEB REF</a><br>
+                <a href="https://rovrplus.aa.com" target="_blank" style="color: #66ccff;">ROVR</a><br>
+                <a href="https://helpdesk.aa.com" target="_blank" style="color: #66ccff;">IT HELP DESK</a><br>
+                <a href="https://nasstatus.faa.gov/" target="_blank" style="color: #66ccff;">NAT Airspace</a><br>
+                <a href="https://airportal.aa.com" target="_blank" style="color: #66ccff;">AIRPORTAL</a>
+            </div>
+        </div>
+
+        <!-- Weather Section -->
+        <div class="section">
+            <h2 class="menu-header" onclick="toggleMenu('weatherContent')">
+                Weather
+            </h2>
+            <div class="menu-content" id="weatherContent">
+                <a class="weatherwidget-io" href="https://forecast7.com/en/32d78n96d80/dallas/?unit=us" data-label_1="DFW" data-label_2="WEATHER" data-theme="original">DFW WEATHER</a>
+            </div>
+        </div>
+
+        <!-- Version and Copyright Section -->
+        <div class="section">
+            <p>v1.1</p>
+            <p>&copy; Copyright ALEX ALEXOV for AA ABR</p>
+        </div>
+    </div>
+
+    <script>
+        function searchFlight() {
+            const flightNumber = document.getElementById("flightNumber").value.trim();
+            const searchOption = document.getElementById("searchOption").value;
+            if (flightNumber) {
+                let url = `${searchOption === "flightaware" ? "https://www.flightaware.com/live/flight/AAL" : "https://www.flightradar24.com/AAL"}${encodeURIComponent(flightNumber)}`;
+                window.location.href = url;
+            } else {
+                alert("Please enter a flight number.");
+            }
+        }
+
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.animationDuration = `${2 + Math.random() * 3}s`;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function toggleMenu(menuId) {
+            const menuContent = document.getElementById(menuId);
+            menuContent.style.display = menuContent.style.display === "block" ? "none" : "block";
+        }
+
+        createStars();
+    </script>
+    <!-- Weather Widget Script -->
+    <script>
+        !function(d,s,id){
+            var js,fjs=d.getElementsByTagName(s)[0];
+            if(!d.getElementById(id)){
+                js=d.createElement(s);
+                js.id=id;
+                js.src='https://weatherwidget.io/js/widget.min.js';
+                fjs.parentNode.insertBefore(js,fjs);
+            }
+        }(document,'script','weatherwidget-io-js');
+    </script>
+</body>
+</html>
