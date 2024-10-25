@@ -3,61 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Airport Maps</title>
+    <title>ABR Maps</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
     <style>
+        :root {
+            --primary-color: #0073e6;
+            --secondary-color: #37474f;
+            --background-light: #f5f5f5;
+            --background-dark: #263238;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+        }
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #e0f7fa;
-            color: #333;
+            font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            transition: background-color 0.3s, color 0.3s;
         }
         header {
-            background-color: #0073e6;
-            color: #fff;
+            background-color: var(--primary-color);
+            color: var(--text-light);
             padding: 2rem;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         header h1 {
             font-size: 2.5rem;
+            font-weight: bold;
         }
         main {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 2rem auto;
             padding: 2rem;
-            background-color: #fff;
             border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         }
-        iframe {
+        .map-container {
+            position: relative;
             width: 100%;
-            height: 500px;
+            height: 0;
+            padding-bottom: 56.25%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .map-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             border: none;
-            border-radius: 8px;
         }
-        a {
+        .map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            display: none;
+        }
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            main {
+                padding: 1.5rem;
+            }
+            .map-container {
+                height: 85vh;
+                padding-bottom: 0;
+                border-radius: 0;
+            }
+        }
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.75rem;
+            }
+            main {
+                padding: 1rem;
+            }
+            .map-container {
+                height: 90vh;
+                padding-bottom: 0;
+                border-radius: 0;
+            }
+        }
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .map-container {
+                height: 80vh;
+                padding-bottom: 0;
+            }
+        }
+        @media (min-width: 1200px) {
+            header h1 {
+                font-size: 3rem;
+            }
+            main {
+                max-width: 1400px;
+                padding: 3rem;
+            }
+        }
+        .toggle-view-btn {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        .toggle-view-btn button {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        .toggle-view-btn button:hover {
+            background-color: #005bb5;
+        }
+        .toggle-theme {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .toggle-theme:hover {
+            background-color: #005bb5;
+        }
+        .back-btn {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        .back-btn a {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            padding: 1rem 2rem;
+            border-radius: 50px;
             text-decoration: none;
-            color: #0073e6;
-            transition: color 0.3s;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
         }
-        a:hover {
-            text-decoration: underline;
-            color: #004d99;
+        .back-btn a:hover {
+            background-color: #455a64;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Airport Maps</h1>
-        <p>Explore airport locations and layouts</p>
+        <h1>ABR Maps</h1>
+        <p>Interactive map optimized for all devices</p>
     </header>
     <main>
-        <iframe src="https://map.dfwairport.com/?_gl=1*1apmopr*_gcl_au*MTEzMjU5NDc0LjE3Mjk3OTgyNzc.*_ga*MTMxNDAyODE5Ni4xNzI5Nzk4Mjc3*_ga_JY80H9YV46*MTcyOTc5ODI3Ny4xLjAuMTcyOTc5ODI3Ny42MC4wLjA.*_ga_NH154WP1NJ*MTcyOTc5ODI3Ny4xLjAuMTcyOTc5ODI3Ny42MC4wLjA."></iframe>
-        <p>Use the map above to view airport locations. Zoom in to see more details about the surrounding areas and terminal layouts.</p>
-        <p><a href="index.html">Return to Home Page</a></p>
+        <div class="map-container" id="map-container">
+            <div class="map-overlay" id="map-overlay"></div>
+            <iframe id="map-iframe" src="https://map.dfwairport.com/?_gl=1*1apmopr*_gcl_au*MTEzMjU5NDc0LjE3Mjk3OTgyNzc.*_ga*MTMxNDAyODE5Ni4xNzI5Nzk4Mjc3*_ga_JY80H9YV46*MTcyOTc5ODI3Ny4xLjAuMTcyOTc5ODI3Ny42MC4wLjA.*_ga_NH154WP1NJ*MTcyOTc5ODI3Ny4xLjAuMTcyOTc5ODI3Ny42MC4wLjA." allowfullscreen></iframe>
+        </div>
+        <div class="toggle-view-btn">
+            <button onclick="toggleMapView()">Toggle Full Screen View</button>
+        </div>
+        <div class="back-btn">
+            <a href="index.html">Back to Home Page</a>
+        </div>
     </main>
+    <button class="toggle-theme" onclick="toggleTheme()">Toggle Theme</button>
+    <script>
+        function toggleMapView() {
+            const mapContainer = document.querySelector('.map-container');
+            if (!document.fullscreenElement) {
+                mapContainer.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function onFullscreenChange() {
+            const mapIframe = document.getElementById('map-iframe');
+            if (document.fullscreenElement) {
+                mapIframe.style.width = '100vw';
+                mapIframe.style.height = '100vh';
+            } else {
+                mapIframe.style.width = '100%';
+                mapIframe.style.height = '100%';
+            }
+        }
+
+        document.addEventListener('fullscreenchange', onFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+        document.addEventListener('mozfullscreenchange', onFullscreenChange);
+        document.addEventListener('MSFullscreenChange', onFullscreenChange);
+
+        function toggleTheme() {
+            const root = document.documentElement;
+            const overlay = document.getElementById('map-overlay');
+            if (getComputedStyle(root).getPropertyValue('--background-light').trim() === '#f5f5f5') {
+                root.style.setProperty('--background-light', '#263238');
+                root.style.setProperty('--text-dark', '#ffffff');
+                root.style.setProperty('--primary-color', '#37474f');
+                root.style.setProperty('--secondary-color', '#0073e6');
+                overlay.style.display = 'block'; // Show the overlay in dark mode
+            } else {
+                root.style.setProperty('--background-light', '#f5f5f5');
+                root.style.setProperty('--text-dark', '#333333');
+                root.style.setProperty('--primary-color', '#0073e6');
+                root.style.setProperty('--secondary-color', '#37474f');
+                overlay.style.display = 'none'; // Hide the overlay in light mode
+            }
+        }
+    </script>
 </body>
 </html>
-
