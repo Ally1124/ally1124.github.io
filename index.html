@@ -3,106 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aviation Information Repository</title>
+    <title>ABR Tools</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
     <style>
+        :root {
+            --primary-color: #0073e6;
+            --secondary-color: #37474f;
+            --background-light: #f5f5f5;
+            --background-dark: #263238;
+            --content-background-light: #ffffff;
+            --content-background-dark: #2e3b42;
+            --content-background-dark-contrast: #37474f;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+            --rainbow-color: #7bdcb5;
+        }
         body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(to bottom, #e0f7fa, #b3e5fc);
-            color: #333;
+            font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            transition: background-color 0.3s, color 0.3s;
         }
         header {
-            background: url('https://www.example.com/airport-banner.jpg') no-repeat center center;
-            background-size: cover;
-            color: #fff;
+            background-color: var(--primary-color);
+            color: var(--text-light);
             padding: 3rem;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         header h1 {
             font-size: 3rem;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            font-weight: bold;
         }
         header p {
             font-size: 1.25rem;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
         }
         main {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 2rem auto;
-            padding: 2.5rem;
-            background: linear-gradient(to bottom right, #ffffff, #e3f2fd);
+            padding: 2rem;
+            background: var(--content-background-light);
             border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
         }
         .link-section {
             margin-bottom: 3rem;
         }
-        h2 {
-            color: #004d99;
-            font-size: 2rem;
-            text-decoration: underline;
+        .collapsible {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 1rem;
+            text-align: left;
+            border: none;
+            outline: none;
+            font-size: 1.5rem;
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: background-color 0.3s;
+        }
+        .collapsible:hover {
+            background-color: #455a64;
+        }
+        .content {
+            padding: 0 1rem;
+            display: none;
+            overflow: hidden;
+            background-color: var(--content-background-light);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            transition: background-color 0.3s;
         }
         ul {
             list-style: none;
-            padding: 0;
+            padding: 1rem;
         }
         ul li {
-            margin: 1rem 0;
+            margin: 0.75rem 0;
             display: flex;
             align-items: center;
-            background: #e0f2f1;
             padding: 0.75rem;
             border-radius: 8px;
             transition: background 0.3s;
         }
         ul li:hover {
-            background: #b2ebf2;
+            background: #e0e0e0;
         }
         ul li:before {
             content: "\2708";
-            color: #0073e6;
+            color: var(--primary-color);
             margin-right: 1rem;
             font-size: 1.5rem;
         }
         a {
             text-decoration: none;
-            color: #0073e6;
+            color: var(--primary-color);
             font-weight: bold;
             transition: color 0.3s;
         }
         a:hover {
             text-decoration: underline;
-            color: #004d99;
+            color: #005bb5;
+        }
+        .toggle-theme {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .toggle-theme:hover {
+            background-color: #005bb5;
+        }
+        .faq-section {
+            margin-top: 3rem;
+        }
+        @media (max-width: 768px) {
+            header {
+                padding: 2rem;
+            }
+            header h1 {
+                font-size: 2.5rem;
+            }
+            header p {
+                font-size: 1rem;
+            }
+            main {
+                padding: 1.5rem;
+            }
+            .collapsible {
+                font-size: 1.25rem;
+            }
+        }
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            header p {
+                font-size: 0.9rem;
+            }
+            .collapsible {
+                font-size: 1rem;
+                padding: 0.75rem;
+            }
+        }
+        @media (min-width: 1200px) {
+            header h1 {
+                font-size: 3.5rem;
+            }
+            header p {
+                font-size: 1.5rem;
+            }
+            main {
+                max-width: 1400px;
+                padding: 3rem;
+            }
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme Toggle Button
+            const header = document.querySelector('header');
+            const themeToggleBtn = document.createElement('button');
+            themeToggleBtn.classList.add('toggle-theme');
+            themeToggleBtn.textContent = 'Toggle Theme';
+            header.appendChild(themeToggleBtn);
+
+            let currentMode = 'light';
+            themeToggleBtn.addEventListener('click', function() {
+                if (currentMode === 'light') {
+                    document.body.style.backgroundColor = 'var(--background-dark)';
+                    document.body.style.color = 'var(--text-light)';
+                    document.querySelector('main').style.backgroundColor = 'var(--content-background-dark)';
+                    themeToggleBtn.style.backgroundColor = 'var(--secondary-color)';
+                    themeToggleBtn.style.color = 'var(--text-light)';
+                    const collapsibleSections = document.querySelectorAll('.content');
+                    collapsibleSections.forEach(section => {
+                        section.style.backgroundColor = 'var(--content-background-dark-contrast)';
+                    });
+                    currentMode = 'dark';
+                } else if (currentMode === 'dark') {
+                    document.body.style.backgroundColor = 'var(--rainbow-color)'; // Simplified to a single color to avoid performance issues
+                    document.body.style.color = 'var(--text-light)';
+                    document.querySelector('main').style.backgroundColor = 'var(--rainbow-color)';
+                    themeToggleBtn.style.backgroundColor = '#ff6b6b';
+                    themeToggleBtn.style.color = 'var(--text-light)';
+                    const collapsibleSections = document.querySelectorAll('.content');
+                    collapsibleSections.forEach(section => {
+                        section.style.backgroundColor = '#333';
+                    });
+                    currentMode = 'rainbow';
+                } else {
+                    document.body.style.backgroundColor = 'var(--background-light)';
+                    document.body.style.color = 'var(--text-dark)';
+                    document.querySelector('main').style.backgroundColor = '#f0f0f0';
+                    themeToggleBtn.style.backgroundColor = 'var(--primary-color)';
+                    themeToggleBtn.style.color = 'var(--text-light)';
+                    const collapsibleSections = document.querySelectorAll('.content');
+                    collapsibleSections.forEach(section => {
+                        section.style.backgroundColor = '#fafafa';
+                    });
+                    currentMode = 'light';
+                }
+            });
+
+            // Collapsible Sections
+            const coll = document.querySelectorAll(".collapsible");
+            coll.forEach(button => {
+                button.addEventListener("click", function() {
+                    this.classList.toggle("active");
+                    const content = this.nextElementSibling;
+                    if (content.style.display === "block") {
+                        content.style.display = "none";
+                    } else {
+                        content.style.display = "block";
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 <body>
     <header>
-        <h1>Aviation Information Repository</h1>
-        <p>Your one-stop collection for useful links and resources related to aviation and airports</p>
+        <h1>ABR Tools</h1>
+        <p>Your one-stop collection for useful links, tools, and resources related to aviation and airports</p>
     </header>
     <main>
         <div class="link-section">
-            <h2>Internal Pages</h2>
-            <ul>
-                <li><a href="operations.html">Operations</a></li>
-                <li><a href="maps.html">Maps</a></li>
-                <li><a href="hub_info.html">Hub Info</a></li>
-                <li><a href="phone_list.html">Phone List</a></li>
-            </ul>
+            <button class="collapsible">Internal Pages</button>
+            <div class="content">
+                <ul>
+                    <li><a href="operations.html">Operations</a></li>
+                    <li><a href="maps.html">Maps</a></li>
+                    <li><a href="hub_info.html">Hub Info</a></li>
+                    <li><a href="phone_list.html">Phone List</a></li>
+                </ul>
+            </div>
         </div>
         <div class="link-section">
-            <h2>External Resources</h2>
-            <ul>
-                <li><a href="https://www.wikipedia.org" target="_blank">Wikipedia</a></li>
-                <li><a href="https://www.stackoverflow.com" target="_blank">Stack Overflow</a></li>
-                <li><a href="https://www.github.com" target="_blank">GitHub</a></li>
-                <li><a href="https://www.w3schools.com" target="_blank">W3Schools - Learn to Code</a></li>
-                <li><a href="https://developer.mozilla.org" target="_blank">MDN Web Docs</a></li>
-            </ul>
+            <button class="collapsible">External Resources</button>
+            <div class="content">
+                <ul>
+                    <li><a href="https://www.wikipedia.org" target="_blank">Wikipedia</a></li>
+                    <li><a href="https://www.stackoverflow.com" target="_blank">Stack Overflow</a></li>
+                    <li><a href="https://www.github.com" target="_blank">GitHub</a></li>
+                    <li><a href="https://www.w3schools.com" target="_blank">W3Schools - Learn to Code</a></li>
+                    <li><a href="https://developer.mozilla.org" target="_blank">MDN Web Docs</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="link-section">
+            <button class="collapsible">Future Tools & Resources</button>
+            <div class="content">
+                <ul>
+                    <li>Placeholder Tool 1</li>
+                    <li>Placeholder Tool 2</li>
+                    <li>Placeholder Tool 3</li>
+                    <li>Placeholder Tool 4</li>
+                    <li>Placeholder Tool 5</li>
+                </ul>
+            </div>
+        </div>
+        <div class="faq-section">
+            <button class="collapsible">Frequently Asked Questions</button>
+            <div class="content">
+                <ul>
+                    <li>What is ABR Tools?</li>
+                    </ul>
+            </div>
         </div>
     </main>
 </body>
