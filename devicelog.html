@@ -39,7 +39,7 @@
         .tab-content.active {
             display: block;
         }
-        input {
+        input, button {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -48,14 +48,8 @@
             border-radius: 5px;
         }
         button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
             background-color: #007bff;
             color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
             cursor: pointer;
         }
         button:hover {
@@ -103,6 +97,7 @@
         <div class="tab" onclick="showTab('log')">Log</div>
     </div>
 
+    <!-- Camera Tab -->
     <div id="camera" class="tab-content active">
         <button onclick="startBarcodeScanner()">Start Camera</button>
         <video id="preview"></video>
@@ -113,6 +108,7 @@
         <button onclick="addCameraLog()">Submit</button>
     </div>
 
+    <!-- Scanner Tab -->
     <div id="scanner" class="tab-content">
         <label for="scanner-device">Device Info:</label>
         <input type="text" id="scanner-device" placeholder="Enter device barcode" oninput="scannerAutomation('scanner-employee')">
@@ -120,6 +116,7 @@
         <input type="text" id="scanner-employee" placeholder="Enter employee badge" oninput="scannerSubmit()">
     </div>
 
+    <!-- Manual Tab -->
     <div id="manual" class="tab-content">
         <label for="manual-device">Device Info:</label>
         <input type="text" id="manual-device" placeholder="Enter device barcode">
@@ -128,23 +125,21 @@
         <button onclick="addManualLog()">Submit</button>
     </div>
 
+    <!-- Log Tab -->
     <div id="log" class="tab-content">
         <div class="log">
             <strong>Formatted Output Log:</strong>
             <ul id="log-list"></ul>
             <button onclick="copyLog()">Copy All</button>
             <button onclick="clearLog()">Clear Log</button>
+            <button onclick="sendLogEmail()">Send Log via Email</button>
         </div>
     </div>
 
-    <div class="footer">
-        Version 1 | Alex Alexov
-    </div>
+    <div class="footer">Version 1 | Alex Alexov</div>
 
     <script>
         let scannerTimeout;
-
-        document.addEventListener('DOMContentLoaded', loadLog);
 
         function showTab(tabId) {
             const tabs = document.querySelectorAll('.tab-content');
@@ -165,22 +160,30 @@
             clearTimeout(scannerTimeout);
             scannerTimeout = setTimeout(() => {
                 document.getElementById(nextInputId).focus();
-            }, 1000);
+            }, 1000); // Move to employee field after 1 second
         }
 
         function scannerSubmit() {
             clearTimeout(scannerTimeout);
             scannerTimeout = setTimeout(() => {
-                const device = formatDevice(document.getElementById('scanner-device').value);
-                const employee = formatEmployee(document.getElementById('scanner-employee').value);
+                const device = document.getElementById('scanner-device').value.trim();
+                const employee = document.getElementById('scanner-employee').value.trim();
 
-                if (device && employee) {
-                    logFormattedData(device, employee);
-                    document.getElementById('scanner-device').value = '';
-                    document.getElementById('scanner-employee').value = '';
-                    document.getElementById('scanner-device').focus();
+                if (!device || !employee) {
+                    alert("Both fields are required.");
+                    return;
                 }
-            }, 1000);
+
+                const formattedLog = `${device}/${employee}`;
+                const logList = document.getElementById('log-list');
+                const newLogItem = document.createElement('li');
+                newLogItem.textContent = formattedLog;
+                logList.appendChild(newLogItem);
+
+                document.getElementById('scanner-device').value = '';
+                document.getElementById('scanner-employee').value = '';
+                document.getElementById('scanner-device').focus();
+            }, 1000); // Submit after 1 second
         }
 
         async function startBarcodeScanner() {
@@ -195,90 +198,81 @@
                             const text = result.text;
 
                             if (!document.getElementById('camera-device').value) {
-                                document.getElementById('camera-device').value = formatDevice(text);
+                                document.getElementById('camera-device').value = text;
                             } else if (!document.getElementById('camera-employee').value) {
-                                document.getElementById('camera-employee').value = formatEmployee(text);
+                                document.getElementById('camera-employee').value = text;
                             }
                         }
                     }
                 );
             } catch (error) {
-                console.error(error);
-                alert('Error starting camera: ' + error.message);
+                alert("Error starting camera: " + error.message);
             }
         }
 
         function addCameraLog() {
-            const device = formatDevice(document.getElementById('camera-device').value);
-            const employee = formatEmployee(document.getElementById('camera-employee').value);
+            const device = document.getElementById('camera-device').value.trim();
+            const employee = document.getElementById('camera-employee').value.trim();
 
-            if (device && employee) {
-                logFormattedData(device, employee);
-                document.getElementById('camera-device').value = '';
-                document.getElementById('camera-employee').value = '';
-            } else {
-                alert('Please fill both fields.');
+            if (!device || !employee) {
+                alert("Both fields are required.");
+                return;
             }
+
+            const formattedLog = `${device}/${employee}`;
+            const logList = document.getElementById('log-list');
+            const newLogItem = document.createElement('li');
+            newLogItem.textContent = formattedLog;
+            logList.appendChild(newLogItem);
+
+            document.getElementById('camera-device').value = '';
+            document.getElementById('camera-employee').value = '';
         }
 
         function addManualLog() {
-            const device = formatDevice(document.getElementById('manual-device').value);
-            const employee = formatEmployee(document.getElementById('manual-employee').value);
+            const device = document.getElementById('manual-device').value.trim();
+            const employee = document.getElementById('manual-employee').value.trim();
 
-            if (device && employee) {
-                logFormattedData(device, employee);
-                document.getElementById('manual-device').value = '';
-                document.getElementById('manual-employee').value = '';
-            } else {
-                alert('Please fill both fields.');
+            if (!device || !employee) {
+                alert("Both fields are required.");
+                return;
             }
-        }
 
-        function formatDevice(device) {
-            return device.startsWith('AATC') ? device.slice(4) : device;
-        }
-
-        function formatEmployee(employee) {
-            return employee.startsWith('EMP') ? employee.match(/\d+/)[0] : employee;
-        }
-
-        function logFormattedData(device, employee) {
+            const formattedLog = `${device}/${employee}`;
             const logList = document.getElementById('log-list');
             const newLogItem = document.createElement('li');
-            newLogItem.textContent = `${device}/${employee}`;
+            newLogItem.textContent = formattedLog;
             logList.appendChild(newLogItem);
 
-            saveLog();
-        }
-
-        function saveLog() {
-            const logItems = [...document.querySelectorAll('#log-list li')].map(item => item.textContent);
-            localStorage.setItem('deviceLog', JSON.stringify(logItems));
-        }
-
-        function loadLog() {
-            const logList = document.getElementById('log-list');
-            const savedLog = JSON.parse(localStorage.getItem('deviceLog') || '[]');
-
-            savedLog.forEach(entry => {
-                const newLogItem = document.createElement('li');
-                newLogItem.textContent = entry;
-                logList.appendChild(newLogItem);
-            });
-        }
-
-        function clearLog() {
-            localStorage.removeItem('deviceLog');
-            document.getElementById('log-list').innerHTML = '';
+            document.getElementById('manual-device').value = '';
+            document.getElementById('manual-employee').value = '';
         }
 
         function copyLog() {
             const logItems = [...document.querySelectorAll('#log-list li')].map(item => item.textContent);
             navigator.clipboard.writeText(logItems.join('\n')).then(() => {
                 alert('Log copied to clipboard!');
-            }).catch(err => {
-                alert('Failed to copy log. Please try again.');
             });
+        }
+
+        function clearLog() {
+            document.getElementById('log-list').innerHTML = '';
+        }
+
+        function sendLogEmail() {
+            const logItems = [...document.querySelectorAll('#log-list li')].map(item => item.textContent);
+            const logText = logItems.join('\n');
+            const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            const subject = `Device Log - ${currentDate}`;
+            const body = encodeURIComponent(logText);
+
+            if (logItems.length === 0) {
+                alert("The log is empty. Add entries before sending.");
+                return;
+            }
+
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${body}`;
+            window.location.href = mailtoLink;
         }
     </script>
 </body>
