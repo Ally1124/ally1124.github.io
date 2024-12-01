@@ -97,9 +97,9 @@
 
     <div id="manual" class="tab-content">
         <label for="manual-device">Enter Device ID:</label>
-        <input type="text" id="manual-device" placeholder="Enter Device ID (e.g., AATC405593)">
+        <input type="text" id="manual-device" placeholder="Enter Device ID (e.g., AATC12345)">
         <label for="manual-employee">Enter Employee Number:</label>
-        <input type="text" id="manual-employee" placeholder="Enter Employee Number (e.g., 265769)">
+        <input type="text" id="manual-employee" placeholder="Enter Employee Number (e.g., EMP 12345AA01)">
         <button onclick="formatAndLogData('manual')">Format and Log</button>
     </div>
 
@@ -149,10 +149,9 @@
         }
 
         function autoLogScanner(input1, input2) {
-            // Determine which is device and which is employee
-            const isEmployee = value => /\d{6,}/.test(value); // Assume employee has a long numeric part
-            const deviceInput = isEmployee(input1) ? input2 : input1;
-            const employeeInput = isEmployee(input1) ? input1 : input2;
+            // Extract the numeric portion from the inputs
+            const deviceInput = input1.startsWith('AATC') ? input1.slice(4) : input1;
+            const employeeInput = input2.startsWith('EMP') ? input2.match(/\d+/)[0] : input2;
 
             // Format and log the data
             formatAndLogData('scanner', deviceInput, employeeInput);
@@ -169,6 +168,10 @@
             if (source === 'manual') {
                 device = document.getElementById('manual-device').value.trim();
                 employee = document.getElementById('manual-employee').value.trim();
+
+                // Extract the numeric portion
+                device = device.startsWith('AATC') ? device.slice(4) : device;
+                employee = employee.startsWith('EMP') ? employee.match(/\d+/)[0] : employee;
             }
 
             // Validate inputs
@@ -185,12 +188,6 @@
             const newLogItem = document.createElement('li');
             newLogItem.textContent = formattedData;
             logList.appendChild(newLogItem);
-
-            // Clear inputs for manual
-            if (source === 'manual') {
-                document.getElementById('manual-device').value = '';
-                document.getElementById('manual-employee').value = '';
-            }
         }
 
         function copyLog() {
