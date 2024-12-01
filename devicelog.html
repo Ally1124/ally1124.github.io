@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Device Log</title>
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -60,6 +61,12 @@
         button:hover {
             background-color: #0056b3;
         }
+        video {
+            width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+        }
         .log {
             margin-top: 20px;
             padding: 15px;
@@ -95,6 +102,8 @@
     </div>
 
     <div id="scanner" class="tab-content active">
+        <button onclick="startBarcodeScanner()">Scan Barcode</button>
+        <video id="preview"></video>
         <label for="scanner-input-1">Input 1 (Device or Employee):</label>
         <input type="text" id="scanner-input-1" placeholder="Scan or enter device/employee" oninput="delayFocus('scanner-input-2')">
         <label for="scanner-input-2">Input 2 (Device or Employee):</label>
@@ -123,17 +132,38 @@
         let focusTimeout, logTimeout;
 
         function showTab(tabId) {
-            // Hide all tab content
             const tabs = document.querySelectorAll('.tab-content');
             tabs.forEach(tab => tab.classList.remove('active'));
 
-            // Deactivate all tabs
             const tabButtons = document.querySelectorAll('.tab');
             tabButtons.forEach(button => button.classList.remove('active'));
 
-            // Show the selected tab content and activate the tab
             document.getElementById(tabId).classList.add('active');
             document.querySelector(`.tab.${tabId === 'scanner' ? 'active' : ''}`).classList.add('active');
+        }
+
+        function startBarcodeScanner() {
+            const codeReader = new ZXing.BrowserBarcodeReader();
+            const previewElem = document.getElementById('preview');
+
+            codeReader.decodeFromVideoDevice(null, previewElem, result => {
+                if (result) {
+                    const inputField =
+                        document.getElementById('scanner-input-1').value === ''
+                            ? 'scanner-input-1'
+                            : 'scanner-input-2';
+
+                    document.getElementById(inputField).value = result.text;
+                    if (inputField === 'scanner-input-1') {
+                        delayFocus('scanner-input-2');
+                    } else {
+                        delayLog();
+                    }
+                }
+            }).catch(err => {
+                console.error(err);
+                alert('Error starting barcode scanner.');
+            });
         }
 
         function delayFocus(nextInputId) {
@@ -142,7 +172,7 @@
             if (input1) {
                 focusTimeout = setTimeout(() => {
                     document.getElementById(nextInputId).focus();
-                }, 1000); // Delay of 1 second
+                }, 1000);
             }
         }
 
@@ -154,23 +184,18 @@
             if (input1 && input2) {
                 logTimeout = setTimeout(() => {
                     autoLogScanner(input1, input2);
-                }, 1000); // Delay of 1 second
+                }, 1000);
             }
         }
 
         function autoLogScanner(input1, input2) {
-            // Extract the numeric portion from the inputs
             const deviceInput = input1.startsWith('AATC') ? input1.slice(4) : input1;
             const employeeInput = input2.startsWith('EMP') ? input2.match(/\d+/)[0] : input2;
 
-            // Format and log the data
             formatAndLogData('scanner', deviceInput, employeeInput);
 
-            // Clear inputs for the next scan
             document.getElementById('scanner-input-1').value = '';
             document.getElementById('scanner-input-2').value = '';
-
-            // Return focus to the device info field
             document.getElementById('scanner-input-1').focus();
         }
 
@@ -178,22 +203,17 @@
             if (source === 'manual') {
                 device = document.getElementById('manual-device').value.trim();
                 employee = document.getElementById('manual-employee').value.trim();
-
-                // Extract the numeric portion
                 device = device.startsWith('AATC') ? device.slice(4) : device;
                 employee = employee.startsWith('EMP') ? employee.match(/\d+/)[0] : employee;
             }
 
-            // Validate inputs
             if (!device || !employee) {
                 alert('Please provide valid inputs for both fields!');
                 return;
             }
 
-            // Format data
             const formattedData = `${device}/${employee}`;
 
-            // Log formatted data
             const logList = document.getElementById('log-list');
             const newLogItem = document.createElement('li');
             newLogItem.textContent = formattedData;
@@ -201,14 +221,12 @@
         }
 
         function copyLog() {
-            // Get all log items
             const logItems = document.querySelectorAll('#log-list li');
             let logText = '';
             logItems.forEach(item => {
                 logText += item.textContent + '\n';
             });
 
-            // Copy to clipboard
             navigator.clipboard.writeText(logText).then(() => {
                 alert('Log copied to clipboard!');
             }).catch(err => {
