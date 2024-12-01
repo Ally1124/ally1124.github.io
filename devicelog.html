@@ -122,9 +122,9 @@
 
     <div id="manual" class="tab-content">
         <label for="manual-device">Device Info:</label>
-        <input type="text" id="manual-device" placeholder="Device barcode">
+        <input type="text" id="manual-device" placeholder="Enter device barcode">
         <label for="manual-employee">Employee Badge:</label>
-        <input type="text" id="manual-employee" placeholder="Employee badge">
+        <input type="text" id="manual-employee" placeholder="Enter employee badge">
         <button onclick="addManualLog()">Submit</button>
     </div>
 
@@ -133,6 +133,7 @@
             <strong>Formatted Output Log:</strong>
             <ul id="log-list"></ul>
             <button onclick="copyLog()">Copy All</button>
+            <button onclick="clearLog()">Clear Log</button>
         </div>
     </div>
 
@@ -142,6 +143,8 @@
 
     <script>
         let scannerTimeout;
+
+        document.addEventListener('DOMContentLoaded', loadLog);
 
         function showTab(tabId) {
             const tabs = document.querySelectorAll('.tab-content');
@@ -162,7 +165,7 @@
             clearTimeout(scannerTimeout);
             scannerTimeout = setTimeout(() => {
                 document.getElementById(nextInputId).focus();
-            }, 1000); // Wait 1 second and move to the employee field
+            }, 1000);
         }
 
         function scannerSubmit() {
@@ -175,9 +178,9 @@
                     logFormattedData(device, employee);
                     document.getElementById('scanner-device').value = '';
                     document.getElementById('scanner-employee').value = '';
-                    document.getElementById('scanner-device').focus(); // Reset to device field
+                    document.getElementById('scanner-device').focus();
                 }
-            }, 1000); // Wait 1 second and auto-submit
+            }, 1000);
         }
 
         async function startBarcodeScanner() {
@@ -244,16 +247,34 @@
             const newLogItem = document.createElement('li');
             newLogItem.textContent = `${device}/${employee}`;
             logList.appendChild(newLogItem);
+
+            saveLog();
+        }
+
+        function saveLog() {
+            const logItems = [...document.querySelectorAll('#log-list li')].map(item => item.textContent);
+            localStorage.setItem('deviceLog', JSON.stringify(logItems));
+        }
+
+        function loadLog() {
+            const logList = document.getElementById('log-list');
+            const savedLog = JSON.parse(localStorage.getItem('deviceLog') || '[]');
+
+            savedLog.forEach(entry => {
+                const newLogItem = document.createElement('li');
+                newLogItem.textContent = entry;
+                logList.appendChild(newLogItem);
+            });
+        }
+
+        function clearLog() {
+            localStorage.removeItem('deviceLog');
+            document.getElementById('log-list').innerHTML = '';
         }
 
         function copyLog() {
-            const logItems = document.querySelectorAll('#log-list li');
-            let logText = '';
-            logItems.forEach(item => {
-                logText += item.textContent + '\n';
-            });
-
-            navigator.clipboard.writeText(logText).then(() => {
+            const logItems = [...document.querySelectorAll('#log-list li')].map(item => item.textContent);
+            navigator.clipboard.writeText(logItems.join('\n')).then(() => {
                 alert('Log copied to clipboard!');
             }).catch(err => {
                 alert('Failed to copy log. Please try again.');
