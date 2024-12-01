@@ -1,300 +1,241 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Flight Search</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AA Boarding Pass Parser</title>
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom right, #003366, #66ccff);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            color: white;
-            margin: 0;
-            padding: 5px;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f0f2f5;
         }
-
-        #container {
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            border-radius: 15px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 600px;
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 25px;
         }
-
-        .section {
-            margin: 5px 0;
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        h2 {
-            margin-bottom: 5px;
-        }
-
-        input[type="text"] {
-            padding: 5px;
-            width: 100%;
-            border: none;
-            border-radius: 5px;
-            margin-bottom: 5px;
-        }
-
-        select, input[type="submit"] {
-            padding: 5px;
-            border: none;
-            border-radius: 5px;
-            background-color: #0066cc;
-            color: white;
-            cursor: pointer;
-            margin: 3px;
-            width: calc(100% - 10px);
-        }
-
-        input[type="submit"]:hover {
-            background-color: #005bb5;
-        }
-
-        #stars {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.8;
-            animation: twinkle 3s infinite ease-in-out;
-        }
-
-        @keyframes twinkle {
-            0%, 100% {
-                opacity: 0.8;
-            }
-            50% {
-                opacity: 0.2;
-            }
-        }
-
-        .menu-header {
-            cursor: pointer;
-            padding: 5px;
-            background-color: #005bb5;
-            border-radius: 5px;
-            margin: 3px 0;
-            font-size: 16px;
+        .header {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #0078D2;
         }
-
-        .menu-content {
+        .title {
+            color: #0078D2;
+            margin: 0;
+            font-size: 24px;
+        }
+        .aa-logo {
+            color: #0078D2;
+            font-weight: bold;
+            font-size: 28px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 15px;
+            font-family: monospace;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: none;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .parse-btn {
+            background: #0078D2;
+            color: white;
+        }
+        .clear-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .result {
             display: none;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 5px;
-            border-radius: 5px;
+            background: white;
+            border: 2px solid #0078D2;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
         }
-
-        .phone-number {
-            margin: 2px 0;
+        .field {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            position: relative;
         }
-
-        .menu-header img {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
+        .field:last-child {
+            border-bottom: none;
+        }
+        .field:hover {
+            background-color: #f8f9fa;
+        }
+        .label {
+            width: 250px;
+            font-weight: bold;
+            color: #0078D2;
+        }
+        .value {
+            flex: 1;
+        }
+        .copy-btn {
+            background: transparent;
+            color: #0078D2;
+            padding: 5px 10px;
+            font-size: 12px;
+            border: 1px solid #0078D2;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .field:hover .copy-btn {
+            opacity: 1;
+        }
+        .copy-btn:hover {
+            background: #0078D2;
+            color: white;
+        }
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            display: none;
         }
     </style>
 </head>
-<body onload="lockPage()">
-    <div id="stars"></div>
-    <div id="container">
-        <!-- Flight Look Up Section -->
-        <div class="section">
-            <h2>Search for a Flight</h2>
-            <form id="flightForm" onsubmit="searchFlight(); return false;">
-                <input type="text" id="flightNumber" placeholder="Enter flight number">
-                <select id="searchOption">
-                    <option value="flightaware">FlightAware</option>
-                    <option value="flightradar24">FlightRadar24</option>
-                </select>
-                <input type="submit" value="Search">
-            </form>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Boarding Pass Parser</h1>
+            <div class="aa-logo">AA</div>
         </div>
-
-        <!-- Phone Numbers Section -->
-        <div class="section">
-            <h2>Phone Numbers</h2>
-            <div class="menu-header" onclick="toggleMenu('gatesContent')">
-                Gates
-            </div>
-            <div class="menu-content" id="gatesContent">
-                <div class="phone-number">Terminal A: 46978429XX (XX = Gate Number)</div>
-                <div class="phone-number">Terminal B: 46978487XX (XX = Gate Number)</div>
-                <div class="phone-number">Terminal C: 46978459XX (XX = Gate Number)</div>
-                <div class="phone-number">Terminal D: 46978449XX (XX = Gate Number)</div>
-            </div>
-
-            <div class="menu-header" onclick="toggleMenu('hccContent')">
-                HCC
-            </div>
-            <div class="menu-content" id="hccContent">
-                <div class="phone-number">MOD: 469-784-5000</div>
-                <div class="phone-number">CSM: 469-784-5050</div>
-                <div class="phone-number">Zone 1 (A8 - A17): 469-784-5001</div>
-                <div class="phone-number">Zone 2 (A18 - A28): 469-784-5002</div>
-                <div class="phone-number">Zone 3 (A29 - A39): 469-784-5003</div>
-                <div class="phone-number">Zone 4 (C2 - C15): 469-784-5004</div>
-                <div class="phone-number">Zone 5 (C16 - C26): 469-784-5005</div>
-                <div class="phone-number">Zone 6 (C27 - C39): 469-784-5006</div>
-                <div class="phone-number">Zone 7 (D1 - D25): 469-784-5007</div>
-                <div class="phone-number">Zone 8 (D25 - D40): 469-784-5008</div>
-                <div class="phone-number">Zone 9 (B5 - B12): 469-784-5009</div>
-                <div class="phone-number">Terminal A Gate Coord.: 469-784-5041</div>
-                <div class="phone-number">Terminal C Gate Coord.: 469-784-5042</div>
-                <div class="phone-number">Terminal D-B Gate Coord.: 469-784-5043</div>
-                <div class="phone-number">Move Coordinator: 469-784-5045</div>
-                <div class="phone-number">Company Radio: 469-784-5011</div>
-                <div class="phone-number">Seasonal/Deice Coord.: 469-784-5056</div>
-                <div class="phone-number">A/C Maintenance (TOCC): 469-784-5031</div>
-                <div class="phone-number">Flight Service Duty Manager: 469-784-5204</div>
-                <div class="phone-number">Crew Tracking Supervisor: 469-784-5074</div>
-                <div class="phone-number">POC: 469-784-5061</div>
-                <div class="phone-number">LSG Sky Chefs: 469-784-5102</div>
-                <div class="phone-number">LSG Sky Chefs Supervisor: 469-784-5108</div>
-                <div class="phone-number">ABM - Cabin Cleaning (Dom.): 469-784-5156</div>
-                <div class="phone-number">ABM - Cabin Cleaning (Intl.): 469-784-5157</div>
-                <div class="phone-number">Allied Aviation Fueling: 469-784-5141</div>
-                <div class="phone-number">Jim Kriksciun HCC M.D.: 469-784-5070</div>
-                <div class="phone-number">Johannes Jayasuriya HCC Sr. Mgr: 469-784-5071, 469-784-5072</div>
-                <div class="phone-number">Lori Butler HCC VC relief / Admin Mgr: 469-784-5073, 469-784-5299</div>
-            </div>
-
-            <div class="menu-header" onclick="toggleMenu('abrContent')">
-                ABR
-            </div>
-            <div class="menu-content" id="abrContent">
-                <div class="phone-number">Baggage Perf. CSM: 469-784-4466</div>
-                <div class="phone-number">MBR Bag Control: 469-784-5354</div>
-                <div class="phone-number">Outbound A @ A ABR: 469-784-3179 / 3180</div>
-                <div class="phone-number">Inbound A @ C ABR: 469-784-5356</div>
-                <div class="phone-number">Inbound C @ C ABR: 469-784-5352</div>
-                <div class="phone-number">Reroutes: 469-784-5352</div>
-            </div>
-
-            <div class="menu-header" onclick="toggleMenu('otherContent')">
-                Other
-            </div>
-            <div class="menu-content" id="otherContent">
-                <div class="phone-number">Clean/Spill A: 469-853-5551</div>
-                <div class="phone-number">Clean/Spill B: 972-973-3112</div>
-                <div class="phone-number">Clean/Spill C: 469-853-5551</div>
-                <div class="phone-number">Clean/Spill D: 972-973-3112</div>
-                <div class="phone-number">Clean/Spill E: 972-973-3112</div>
-                <div class="phone-number">Facilities Supervisor: 469-784-3199</div>
-            </div>
-
-            <div class="menu-header" onclick="toggleMenu('unionContent')">
-                Union Contacts
-            </div>
-            <div class="menu-content" id="unionContent">
-                <div class="phone-number">Union Helpdesk: 1-800-888-8888</div>
-                <div class="phone-number">Union Office: 1-800-999-9999</div>
-            </div>
+        
+        <textarea placeholder="Paste your boarding pass data here..."></textarea>
+        
+        <div class="button-group">
+            <button class="parse-btn" onclick="parse()">Parse Data</button>
+            <button class="clear-btn" onclick="clearAll()">Clear</button>
         </div>
-
-        <!-- Union Information Section -->
-        <div class="section">
-            <h2>Union Information</h2>
-            <p>test1234</p>
-            <p><a href="https://spteam.aa.com/sites/DFWROC/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FDFWROC%2FShared%20Documents%2FTWU%2FFleet%20Service%20JCBA%20TA%20final%203%2D9%2D2020%2Epdf&parent=%2Fsites%2FDFWROC%2FShared%20Documents%2FTWU" target="_blank" style="color: #66ccff;">Union Contract</a></p>
-        </div>
-
-        <!-- Links Section -->
-        <div class="section">
-            <h2>Links</h2>
-            <ul>
-                <li><a href="https://prime.app.bags.aa.com" target="_blank" style="color: #66ccff;">PRIME</a></li>
-                <li><a href="https://falcon.app.bags.aa.com" target="_blank" style="color: #66ccff;">FALCON</a></li>
-                <li><a href="https://get.aa.com" target="_blank" style="color: #66ccff;">GET</a></li>
-                <li><a href="https://disp.aa.com" target="_blank" style="color: #66ccff;">DISPATCH</a></li>
-                <li><a href="https://webmail.aa.com" target="_blank" style="color: #66ccff;">EMAIL</a></li>
-                <li><a href="https://webreff.aa.com" target="_blank" style="color: #66ccff;">WEB REF</a></li>
-                <li><a href="https://rovrplus.aa.com" target="_blank" style="color: #66ccff;">ROVR</a></li>
-                <li><a href="https://helpdesk.aa.com" target="_blank" style="color: #66ccff;">IT HELP DESK</a></li>
-                <li><a href="https://nasstatus.faa.gov/" target="_blank" style="color: #66ccff;">NAT Airspace</a></li>
-                <li><a href="https://airportal.aa.com" target="_blank" style="color: #66ccff;">AIRPORTAL</a></li>
-            </ul>
-        </div>
-
-        <!-- Weather Section -->
-        <div class="section">
-            <h2 class="menu-header" onclick="toggleMenu('weatherContent')">
-                Weather
-            </h2>
-            <div class="menu-content" id="weatherContent">
-                <a class="weatherwidget-io" href="https://forecast7.com/en/32d78n96d80/dallas/?unit=us" data-label_1="DFW" data-label_2="WEATHER" data-theme="original">DFW WEATHER</a>
-            </div>
-        </div>
+        
+        <div class="result" id="result"></div>
     </div>
+    
+    <div class="success-message" id="copyMessage">Copied to clipboard!</div>
 
     <script>
-        function lockPage() {
-            if (!sessionStorage.getItem('authenticated')) {
-                document.body.innerHTML = `
-                    <div id="loginContainer" style="height: 100vh; display: flex; justify-content: center; align-items: center;">
-                        <div style="background-color: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 10px; text-align: center;">
-                            <h2 style="color: white;">Enter Passcode</h2>
-                            <input type="password" id="passcode" placeholder="Passcode" style="padding: 10px; border-radius: 5px; border: none; margin-bottom: 10px;"><br>
-                            <button onclick="validatePasscode()" style="padding: 10px 20px; background-color: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Login</button>
-                        </div>
+        function parse() {
+            const input = document.querySelector('textarea').value.trim();
+            const result = document.getElementById('result');
+            
+            try {
+                const parts = input.split(' ').filter(part => part.length > 0);
+                
+                const data = {
+                    formatCode: input.charAt(0),
+                    legs: input.charAt(1),
+                    passengerName: input.substring(2, input.indexOf('.')).trim(),
+                    ticketType: 'E',
+                    recordLocator: parts.find(p => p.startsWith('E')).substring(1),
+                    fromAirport: parts.find(p => p.includes('AA')).substring(0, 3),
+                    toAirport: parts.find(p => p.includes('AA')).substring(3, 6),
+                    airline: 'AA',
+                    flightNumber: parts.find(p => /^\d{4}$/.test(p)),
+                    julianDate: parts.find(p => p.includes('C')).substring(0, 3),
+                    compartment: 'C',
+                    seat: parts.find(p => p.includes('C')).substring(4, 8),
+                    sequence: '0239',
+                    status: '1',
+                    ffNumber: input.substring(input.lastIndexOf('AA') + 3).trim()
+                };
+
+                const julianToDate = (julian) => {
+                    const year = new Date().getFullYear();
+                    const date = new Date(year, 0);
+                    date.setDate(parseInt(julian));
+                    return date.toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+                };
+
+                const fields = [
+                    ['Format code', data.formatCode],
+                    ['Number of legs encoded', data.legs],
+                    ['Passenger name', data.passengerName],
+                    ['Electronic Ticket Indicator', data.ticketType],
+                    ['Record locator', data.recordLocator],
+                    ['From airport code', data.fromAirport],
+                    ['To airport code', data.toAirport],
+                    ['Airline code', data.airline],
+                    ['Flight number', data.flightNumber],
+                    ['Date Of Flight (Julian Date)', `${data.julianDate} (${julianToDate(data.julianDate)})`],
+                    ['Compartment Code', data.compartment],
+                    ['Seat number', data.seat],
+                    ['Check-In Sequence Number', data.sequence],
+                    ['Passenger Status', data.status],
+                    ['Frequent Flyer Number', data.ffNumber]
+                ];
+
+                result.innerHTML = fields.map(([label, value]) => `
+                    <div class="field">
+                        <div class="label">${label}</div>
+                        <div class="value">${value}</div>
+                        <button class="copy-btn" onclick="copyToClipboard('${value}')">Copy</button>
                     </div>
-                `;
+                `).join('');
+                
+                result.style.display = 'block';
+            } catch (error) {
+                result.innerHTML = `<div style="color: red;">Unable to parse boarding pass. Please make sure you've pasted the complete data.</div>`;
+                result.style.display = 'block';
             }
         }
 
-        function validatePasscode() {
-            const passcode = document.getElementById('passcode').value;
-            if (passcode === '1234') {
-                sessionStorage.setItem('authenticated', 'true');
-                location.reload();
-            } else {
-                alert('Incorrect passcode. Access denied.');
-            }
-        }        }
-        function lockPage() {
-            if (!sessionStorage.getItem('authenticated')) {
-                let passcode = prompt('Enter passcode to access the page:');
-                if (passcode === '1234') {
-                    sessionStorage.setItem('authenticated', 'true');
-                    document.body.style.display = 'block';
-                } else {
-                    alert('Incorrect passcode. Access denied.');
-                    document.body.innerHTML = '';
-                }
-            } else {
-                document.body.style.display = 'block';
-            }
+        function clearAll() {
+            document.querySelector('textarea').value = '';
+            document.getElementById('result').style.display = 'none';
         }
-        function lockPage() {
-            let passcode = prompt('Enter passcode to access the page:');
-            if (passcode !== '1234') {
-                alert('Incorrect passcode. Access denied.');
-                document.body.innerHTML = '';
-            }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const message = document.getElementById('copyMessage');
+                message.style.display = 'block';
+                setTimeout(() => {
+                    message.style.display = 'none';
+                }, 2000);
+            });
         }
-        function searchFlight() {
-            const flightNumber = document.getElementById("flightNumber").value.trim();
-            const searchOption = document.getElementById("searchOption").value;
-            if (flightNumber) {
-                let url =
+    </script>
+</body>
+</html>
