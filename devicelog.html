@@ -89,11 +89,10 @@
     </div>
 
     <div id="scanner" class="tab-content active">
-        <label for="device">Scan Device ID:</label>
-        <input type="text" id="device" placeholder="Scan Device ID (e.g., AATC405593)">
-        <label for="employee">Scan Employee Badge:</label>
-        <input type="text" id="employee" placeholder="Scan Employee Badge (e.g., EMP 265769AA01)">
-        <button onclick="formatAndLogData('scanner')">Format and Log</button>
+        <label for="scanner-input-1">Input 1 (Device or Employee):</label>
+        <input type="text" id="scanner-input-1" placeholder="Scan or enter device/employee" oninput="delayFocus('scanner-input-2')">
+        <label for="scanner-input-2">Input 2 (Device or Employee):</label>
+        <input type="text" id="scanner-input-2" placeholder="Scan or enter device/employee" oninput="delayLog()">
     </div>
 
     <div id="manual" class="tab-content">
@@ -111,6 +110,8 @@
     </div>
 
     <script>
+        let focusTimeout, logTimeout;
+
         function showTab(tabId) {
             // Hide all tab content
             const tabs = document.querySelectorAll('.tab-content');
@@ -125,29 +126,59 @@
             document.querySelector(`.tab.${tabId === 'scanner' ? 'active' : ''}`).classList.add('active');
         }
 
-        function formatAndLogData(source) {
-            let deviceInput, employeeInput;
+        function delayFocus(nextInputId) {
+            clearTimeout(focusTimeout);
+            const input1 = document.getElementById('scanner-input-1').value.trim();
+            if (input1) {
+                focusTimeout = setTimeout(() => {
+                    document.getElementById(nextInputId).focus();
+                }, 1000); // Delay of 1 second
+            }
+        }
 
-            if (source === 'scanner') {
-                // Get inputs from scanner tab
-                deviceInput = document.getElementById('device').value.trim();
-                employeeInput = document.getElementById('employee').value.trim();
-                // Extract numeric part of employee badge
-                employeeInput = employeeInput.match(/\d+/) ? employeeInput.match(/\d+/)[0] : '';
-            } else if (source === 'manual') {
-                // Get inputs from manual tab
-                deviceInput = document.getElementById('manual-device').value.trim();
-                employeeInput = document.getElementById('manual-employee').value.trim();
+        function delayLog() {
+            clearTimeout(logTimeout);
+            const input1 = document.getElementById('scanner-input-1').value.trim();
+            const input2 = document.getElementById('scanner-input-2').value.trim();
+
+            if (input1 && input2) {
+                logTimeout = setTimeout(() => {
+                    autoLogScanner(input1, input2);
+                }, 1000); // Delay of 1 second
+            }
+        }
+
+        function autoLogScanner(input1, input2) {
+            // Determine which is device and which is employee
+            const isEmployee = value => /\d{6,}/.test(value); // Assume employee has a long numeric part
+            const deviceInput = isEmployee(input1) ? input2 : input1;
+            const employeeInput = isEmployee(input1) ? input1 : input2;
+
+            // Format and log the data
+            formatAndLogData('scanner', deviceInput, employeeInput);
+
+            // Clear inputs for the next scan
+            document.getElementById('scanner-input-1').value = '';
+            document.getElementById('scanner-input-2').value = '';
+
+            // Return focus to the device info field
+            document.getElementById('scanner-input-1').focus();
+        }
+
+        function formatAndLogData(source, device = '', employee = '') {
+            if (source === 'manual') {
+                device = document.getElementById('manual-device').value.trim();
+                employee = document.getElementById('manual-employee').value.trim();
             }
 
             // Validate inputs
-            if (!deviceInput || !employeeInput) {
+            if (!device || !employee) {
                 alert('Please provide valid inputs for both fields!');
                 return;
             }
 
             // Format data
-            const formattedData = `${deviceInput}/${employeeInput}`;
+            const formattedData = `${device}/${employee}`;
 
             // Log formatted data
             const logList = document.getElementById('log-list');
@@ -155,11 +186,8 @@
             newLogItem.textContent = formattedData;
             logList.appendChild(newLogItem);
 
-            // Clear inputs for next entry
-            if (source === 'scanner') {
-                document.getElementById('device').value = '';
-                document.getElementById('employee').value = '';
-            } else if (source === 'manual') {
+            // Clear inputs for manual
+            if (source === 'manual') {
                 document.getElementById('manual-device').value = '';
                 document.getElementById('manual-employee').value = '';
             }
