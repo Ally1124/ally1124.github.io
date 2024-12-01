@@ -16,28 +16,11 @@
             text-align: center;
             color: #343a40;
         }
-        .tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            border: 1px solid #dee2e6;
-            background-color: #ffffff;
-            margin: 0 5px;
-            border-radius: 5px;
-        }
-        .tab.active {
-            background-color: #007bff;
-            color: white;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
+        video {
+            width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
         }
         textarea, input {
             width: 100%;
@@ -61,30 +44,6 @@
         button:hover {
             background-color: #0056b3;
         }
-        video {
-            width: 100%;
-            max-height: 200px;
-            margin-top: 10px;
-            border: 1px solid #ddd;
-        }
-        .log {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            border: 1px solid #dee2e6;
-        }
-        .log ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .log li {
-            background: #ffffff;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ced4da;
-        }
         .footer {
             text-align: center;
             margin-top: 30px;
@@ -95,143 +54,72 @@
 </head>
 <body>
     <h1>Device Log</h1>
-
-    <div class="tabs">
-        <div class="tab active" onclick="showTab('scanner')">Scanner Input</div>
-        <div class="tab" onclick="showTab('manual')">Manual Input</div>
-    </div>
-
-    <div id="scanner" class="tab-content active">
-        <button onclick="startBarcodeScanner()">Scan Barcode</button>
-        <video id="preview"></video>
-        <label for="scanner-input-1">Input 1 (Device or Employee):</label>
-        <input type="text" id="scanner-input-1" placeholder="Scan or enter device/employee" oninput="delayFocus('scanner-input-2')">
-        <label for="scanner-input-2">Input 2 (Device or Employee):</label>
-        <input type="text" id="scanner-input-2" placeholder="Scan or enter device/employee" oninput="delayLog()">
-    </div>
-
-    <div id="manual" class="tab-content">
-        <label for="manual-device">Enter Device ID:</label>
-        <input type="text" id="manual-device" placeholder="Enter Device ID (e.g., AATC12345)">
-        <label for="manual-employee">Enter Employee Number:</label>
-        <input type="text" id="manual-employee" placeholder="Enter Employee Number (e.g., EMP 12345AA01)">
-        <button onclick="formatAndLogData('manual')">Format and Log</button>
-    </div>
-
-    <div class="log" id="log">
-        <strong>Formatted Output Log:</strong>
-        <ul id="log-list"></ul>
-        <button onclick="copyLog()">Copy All</button>
-    </div>
-
-    <div class="footer">
-        Version 1 | Alex Alexov
-    </div>
+    <button onclick="startBarcodeScanner()">Start Camera for Barcode Scan</button>
+    <video id="preview"></video>
+    <label for="scanner-input-1">Device Info:</label>
+    <input type="text" id="scanner-input-1" placeholder="Scan or enter device barcode">
+    <label for="scanner-input-2">Employee Badge:</label>
+    <input type="text" id="scanner-input-2" placeholder="Scan or enter employee badge barcode">
+    <button onclick="submitData()">Submit</button>
+    <div class="footer">Version 1 | Alex Alexov</div>
 
     <script>
-        let focusTimeout, logTimeout;
+        const videoElem = document.getElementById('preview');
+        let codeReader;
 
-        function showTab(tabId) {
-            const tabs = document.querySelectorAll('.tab-content');
-            tabs.forEach(tab => tab.classList.remove('active'));
+        async function startBarcodeScanner() {
+            if (!codeReader) {
+                codeReader = new ZXing.BrowserMultiFormatReader();
+            }
+            try {
+                await codeReader.decodeFromVideoDevice(
+                    null,
+                    videoElem,
+                    result => {
+                        if (result) {
+                            const text = result.text;
 
-            const tabButtons = document.querySelectorAll('.tab');
-            tabButtons.forEach(button => button.classList.remove('active'));
+                            // Check if the data is CODE39 (device) or PDF417 (employee)
+                            if (result.format === ZXing.BarcodeFormat.CODE_39) {
+                                document.getElementById('scanner-input-1').value = text;
+                            } else if (result.format === ZXing.BarcodeFormat.PDF_417) {
+                                document.getElementById('scanner-input-2').value = text;
+                            } else {
+                                alert('Unsupported barcode format.');
+                            }
 
-            document.getElementById(tabId).classList.add('active');
-            document.querySelector(`.tab.${tabId === 'scanner' ? 'active' : ''}`).classList.add('active');
-        }
-
-        function startBarcodeScanner() {
-            const codeReader = new ZXing.BrowserBarcodeReader();
-            const previewElem = document.getElementById('preview');
-
-            codeReader.decodeFromVideoDevice(null, previewElem, result => {
-                if (result) {
-                    const inputField =
-                        document.getElementById('scanner-input-1').value === ''
-                            ? 'scanner-input-1'
-                            : 'scanner-input-2';
-
-                    document.getElementById(inputField).value = result.text;
-                    if (inputField === 'scanner-input-1') {
-                        delayFocus('scanner-input-2');
-                    } else {
-                        delayLog();
+                            // Stop scanning after both inputs are filled
+                            if (
+                                document.getElementById('scanner-input-1').value &&
+                                document.getElementById('scanner-input-2').value
+                            ) {
+                                stopBarcodeScanner();
+                            }
+                        }
                     }
-                }
-            }).catch(err => {
-                console.error(err);
-                alert('Error starting barcode scanner.');
-            });
-        }
-
-        function delayFocus(nextInputId) {
-            clearTimeout(focusTimeout);
-            const input1 = document.getElementById('scanner-input-1').value.trim();
-            if (input1) {
-                focusTimeout = setTimeout(() => {
-                    document.getElementById(nextInputId).focus();
-                }, 1000);
+                );
+            } catch (error) {
+                console.error(error);
+                alert('Error starting barcode scanner: ' + error.message);
             }
         }
 
-        function delayLog() {
-            clearTimeout(logTimeout);
-            const input1 = document.getElementById('scanner-input-1').value.trim();
-            const input2 = document.getElementById('scanner-input-2').value.trim();
-
-            if (input1 && input2) {
-                logTimeout = setTimeout(() => {
-                    autoLogScanner(input1, input2);
-                }, 1000);
+        function stopBarcodeScanner() {
+            if (codeReader) {
+                codeReader.reset();
             }
         }
 
-        function autoLogScanner(input1, input2) {
-            const deviceInput = input1.startsWith('AATC') ? input1.slice(4) : input1;
-            const employeeInput = input2.startsWith('EMP') ? input2.match(/\d+/)[0] : input2;
+        function submitData() {
+            const deviceInfo = document.getElementById('scanner-input-1').value;
+            const employeeInfo = document.getElementById('scanner-input-2').value;
 
-            formatAndLogData('scanner', deviceInput, employeeInput);
-
-            document.getElementById('scanner-input-1').value = '';
-            document.getElementById('scanner-input-2').value = '';
-            document.getElementById('scanner-input-1').focus();
-        }
-
-        function formatAndLogData(source, device = '', employee = '') {
-            if (source === 'manual') {
-                device = document.getElementById('manual-device').value.trim();
-                employee = document.getElementById('manual-employee').value.trim();
-                device = device.startsWith('AATC') ? device.slice(4) : device;
-                employee = employee.startsWith('EMP') ? employee.match(/\d+/)[0] : employee;
-            }
-
-            if (!device || !employee) {
-                alert('Please provide valid inputs for both fields!');
+            if (!deviceInfo || !employeeInfo) {
+                alert('Please fill in both Device Info and Employee Badge fields.');
                 return;
             }
 
-            const formattedData = `${device}/${employee}`;
-
-            const logList = document.getElementById('log-list');
-            const newLogItem = document.createElement('li');
-            newLogItem.textContent = formattedData;
-            logList.appendChild(newLogItem);
-        }
-
-        function copyLog() {
-            const logItems = document.querySelectorAll('#log-list li');
-            let logText = '';
-            logItems.forEach(item => {
-                logText += item.textContent + '\n';
-            });
-
-            navigator.clipboard.writeText(logText).then(() => {
-                alert('Log copied to clipboard!');
-            }).catch(err => {
-                alert('Failed to copy log. Please try again.');
-            });
+            alert(`Submitted Data:\nDevice Info: ${deviceInfo}\nEmployee Info: ${employeeInfo}`);
         }
     </script>
 </body>
