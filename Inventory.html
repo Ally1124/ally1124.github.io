@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button {
+            cursor: pointer;
+        }
+        .error {
+            color: red;
+        }
+        .mode {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Inventory Management</h1>
+    <div>
+        <label for="itemInput">AATC Number:</label>
+        <input type="text" id="itemInput" placeholder="Enter AATC number" oninput="handleAutoSubmit()" onkeydown="handleEnter(event)" />
+        <button onclick="addItem()">Add Item</button>
+        <button onclick="clearAll()">Clear All</button>
+        <p class="error" id="errorMessage"></p>
+        <label>
+            <input type="checkbox" id="manualModeToggle" onchange="toggleMode()" />
+            Enable Manual Entry Mode
+        </label>
+        <p class="mode" id="currentMode">Current Mode: Auto</p>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>AATC Number</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="inventoryTable">
+            <!-- Inventory items will appear here -->
+        </tbody>
+    </table>
+
+    <script>
+        const inventory = new Set();
+        let autoSubmitTimeout = null;
+        let manualMode = false;
+
+        function addItem() {
+            const itemInput = document.getElementById("itemInput");
+            const errorMessage = document.getElementById("errorMessage");
+            const tableBody = document.getElementById("inventoryTable");
+
+            const item = itemInput.value.trim();
+
+            if (!item) {
+                errorMessage.textContent = "Please enter a valid AATC number.";
+                return;
+            }
+
+            if (inventory.has(item)) {
+                errorMessage.textContent = "This item already exists in the inventory.";
+                return;
+            }
+
+            errorMessage.textContent = "";
+            inventory.add(item);
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${inventory.size}</td>
+                <td>${item}</td>
+                <td><button onclick="removeItem('${item}')">Remove</button></td>
+            `;
+            tableBody.appendChild(row);
+
+            itemInput.value = "";
+        }
+
+        function removeItem(item) {
+            const tableBody = document.getElementById("inventoryTable");
+
+            inventory.delete(item);
+
+            Array.from(tableBody.children).forEach((row, index) => {
+                if (row.cells[1].textContent === item) {
+                    tableBody.removeChild(row);
+                }
+            });
+
+            Array.from(tableBody.children).forEach((row, index) => {
+                row.cells[0].textContent = index + 1;
+            });
+        }
+
+        function clearAll() {
+            inventory.clear();
+            document.getElementById("inventoryTable").innerHTML = "";
+        }
+
+        function toggleMode() {
+            manualMode = document.getElementById("manualModeToggle").checked;
+            document.getElementById("currentMode").textContent = `Current Mode: ${manualMode ? "Manual" : "Auto"}`;
+        }
+
+        function handleAutoSubmit() {
+            if (manualMode) return;
+
+            const itemInput = document.getElementById("itemInput");
+
+            if (autoSubmitTimeout) {
+                clearTimeout(autoSubmitTimeout);
+            }
+
+            autoSubmitTimeout = setTimeout(() => {
+                addItem();
+            }, 300);
+        }
+
+        function handleEnter(event) {
+            if (manualMode && event.key === "Enter") {
+                addItem();
+            }
+        }
+    </script>
+</body>
+</html>
