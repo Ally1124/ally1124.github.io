@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Links</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        a, button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            text-decoration: none;
+            color: white;
+            background-color: #007bff;
+            text-align: center;
+            border-radius: 5px;
+        }
+        a:hover, button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quick Links</h1>
+    <p>Use the links below to quickly access Android settings and other websites:</p>
+
+    <!-- Android Settings Links -->
+    <h2>Android Settings</h2>
+    <a href="intent:#Intent;action=android.settings.WIFI_SETTINGS;end;">Open Wi-Fi Settings</a>
+    <a href="intent:#Intent;action=android.settings.BLUETOOTH_SETTINGS;end;">Open Bluetooth Settings</a>
+    <a href="intent:#Intent;action=android.settings.BATTERY_SAVER_SETTINGS;end;">Open Battery Saver Settings</a>
+    <a href="intent:#Intent;action=android.settings.DISPLAY_SETTINGS;end;">Open Display Settings</a>
+
+    <!-- App Specific Settings -->
+    <a href="intent:#Intent;action=android.settings.APPLICATION_DETAILS_SETTINGS;package=com.android.chrome;end;">Open Chrome App Settings</a>
+
+    <!-- General Links -->
+    <h2>General Links</h2>
+    <a href="https://www.google.com" target="_blank">Visit Google</a>
+    <a href="https://www.youtube.com" target="_blank">Visit YouTube</a>
+    <a href="https://www.wikipedia.org" target="_blank">Visit Wikipedia</a>
+    <a href="https://www.github.com" target="_blank">Visit GitHub</a>
+    <a href="https://www.reddit.com" target="_blank">Visit Reddit</a>
+
+</body>
+</html>
