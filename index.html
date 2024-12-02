@@ -3,146 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABR Tools</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+    <title>Secure Access Terminal</title>
     <style>
-        :root {
-            --primary-color: #0073e6;
-            --secondary-color: #37474f;
-            --background-light: #f5f5f5;
-            --background-dark: #263238;
-            --content-background-light: #ffffff;
-            --content-background-dark: #2e3b42;
-            --content-background-dark-contrast: #37474f;
-            --text-light: #ffffff;
-            --text-dark: #333333;
-            --rainbow-color: #7bdcb5;
-        }
         body {
-            font-family: 'Montserrat', sans-serif;
+            background-color: #0a0a0a;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             margin: 0;
-            padding: 0;
-            background-color: var(--background-light);
-            color: var(--text-dark);
-            transition: background-color 0.3s, color 0.3s;
+            text-shadow: 0 0 5px #00ff00;
+            position: relative;
+            overflow-x: hidden;
         }
-        header {
-            background-color: var(--primary-color);
-            color: var(--text-light);
-            padding: 3rem;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        
+        /* Matrix rain effect */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            opacity: 0.1;
         }
-        header h1 {
-            font-size: 3rem;
-            font-weight: bold;
-        }
-        header p {
-            font-size: 1.25rem;
-        }
-        main {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: var(--content-background-light);
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-        }
-        .collapsible {
-            background-color: var(--secondary-color);
-            color: var(--text-light);
-            padding: 1rem;
-            font-size: 1.5rem;
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-        .content {
-            display: none;
+        
+        .terminal {
+            background-color: rgba(0, 20, 0, 0.95);
+            border: 2px solid #00ff00;
+            padding: 30px;
+            box-shadow: 0 0 20px #00ff00;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
             overflow: hidden;
-            background-color: var(--content-background-light);
-            margin-top: 0.5rem;
         }
-        ul {
-            list-style: none;
-            padding: 1rem;
+
+        .terminal::before {
+            content: "INITIALIZING SECURE CONNECTION...";
+            display: block;
+            margin-bottom: 10px;
+            color: #00ff00;
+            font-size: 0.8em;
+            animation: typing 2s steps(40);
         }
-        ul li {
-            padding: 0.75rem;
-            border-radius: 8px;
+
+        .status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 255, 0, 0.1);
+            padding: 5px;
+            font-size: 0.8em;
+            display: flex;
+            justify-content: space-between;
         }
+
+        .header {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #00ff00;
+            position: relative;
+            animation: glitch 5s infinite;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2em;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            text-align: left;
+        }
+
         a {
+            display: block;
+            color: #00ff00;
             text-decoration: none;
-            color: var(--primary-color);
-            font-weight: bold;
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #00ff00;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        a::before {
+            content: "[SYS]";
+            margin-right: 10px;
+            color: #008800;
+        }
+
+        a:hover {
+            background-color: #00ff00;
+            color: #000;
+            box-shadow: 0 0 15px #00ff00;
+            transform: translateX(10px);
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(0, 255, 0, 0.5);
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes glitch {
+            0% { transform: skew(0deg); }
+            2% { transform: skew(2deg); }
+            4% { transform: skew(-2deg); }
+            6% { transform: skew(0deg); }
+            98% { transform: skew(0deg); }
+            100% { transform: skew(0deg); }
+        }
+
+        .terminal-prompt {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .terminal-prompt::before {
+            content: "root@secure-terminal:~$";
+            color: #00aa00;
+            margin-right: 10px;
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .status-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background: rgba(0, 20, 0, 0.9);
+            font-size: 0.8em;
+            border-top: 1px solid #00ff00;
+        }
+
+        .decrypt {
+            animation: decrypt 1s linear;
+        }
+
+        @keyframes decrypt {
+            0% { color: #ff0000; }
+            50% { color: #ffff00; }
+            100% { color: #00ff00; }
         }
     </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const themeToggleBtn = document.createElement('button');
-            themeToggleBtn.textContent = 'Toggle Theme';
-            themeToggleBtn.style.position = 'fixed';
-            themeToggleBtn.style.top = '1rem';
-            themeToggleBtn.style.right = '1rem';
-            document.body.appendChild(themeToggleBtn);
-
-            let currentMode = 'light';
-            themeToggleBtn.addEventListener('click', function() {
-                if (currentMode === 'light') {
-                    document.body.style.backgroundColor = '#263238';
-                    document.body.style.color = '#fff';
-                    currentMode = 'dark';
-                } else {
-                    document.body.style.backgroundColor = '#f5f5f5';
-                    document.body.style.color = '#333';
-                    currentMode = 'light';
-                }
-            });
-
-            const coll = document.querySelectorAll(".collapsible");
-            coll.forEach(button => {
-                button.addEventListener("click", function() {
-                    const content = this.nextElementSibling;
-                    content.style.display = content.style.display === "block" ? "none" : "block";
-                });
-            });
-        });
-    </script>
 </head>
 <body>
-    <header>
-        <h1>ABR Tools</h1>
-        <p>Your one-stop collection for useful links, tools, and resources related to aviation and airports.</p>
-    </header>
-    <main>
-        <div class="link-section">
-            <button class="collapsible">Internal Pages</button>
-            <div class="content">
-                <ul>
-                    <li><a href="devicelog.html">Device Log</a></li>
-                    <li><a href="boarding_pass_decode.html">Boarding Pass Decode</a></li>
-                    <li><a href="new_test_page.html">New Test Page</a></li>
-                    <li><a href="maps.html">Maps</a></li>
-                    <li><a href="hub_info.html">Hub Info</a></li>
-                    <li><a href="phone_list.html">Phone List</a></li>
-                </ul>
-            </div>
+    <canvas class="matrix-bg" id="matrix"></canvas>
+    <div class="terminal">
+        <div class="scan-line"></div>
+        <div class="status-bar">
+            <span id="date"></span>
+            <span>ENCRYPTION: ENABLED</span>
+            <span>STATUS: ACTIVE</span>
         </div>
-        <div class="link-section">
-            <button class="collapsible">External Resources</button>
-            <div class="content">
-                <ul>
-                    <li><a href="https://www.wikipedia.org" target="_blank">Wikipedia</a></li>
-                    <li><a href="https://stackoverflow.com" target="_blank">Stack Overflow</a></li>
-                    <li><a href="https://github.com" target="_blank">GitHub</a></li>
-                    <li><a href="https://w3schools.com" target="_blank">W3Schools</a></li>
-                    <li><a href="https://developer.mozilla.org" target="_blank">MDN Web Docs</a></li>
-                </ul>
-            </div>
+        
+        <div class="header">
+            <h1 class="decrypt">SECURE ACCESS TERMINAL</h1>
         </div>
-        <footer>
-            <p>ABR Tools &copy; 2024. All rights reserved.</p>
-        </footer>
-    </main>
+
+        <div class="terminal-prompt">
+            <span class="blink">_</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="devicelog.html">DEVICE_LOG_MONITOR</a>
+            <a href="barcodetest.html">BARCODE_ANALYSIS</a>
+            <a href="boardingpass.html">BOARDING_VERIFICATION</a>
+            <a href="inventory.html">INVENTORY_CONTROL</a>
+            <a href="test1.html">TEST_PROTOCOL_ALPHA</a>
+            <a href="test2.html">TEST_PROTOCOL_BETA</a>
+            <a href="test3.html">TEST_PROTOCOL_GAMMA</a>
+        </div>
+
+        <div class="status-info">
+            <span id="ipAddress">IP: 192.168.1.1</span> | 
+            <span>PORT: 443</span> | 
+            <span>SECURE_CONNECTION: TRUE</span>
+        </div>
+    </div>
+
+    <script>
+        // Matrix rain effect
+        const canvas = document.querySelector('#matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = "01";
+        const fontSize = 10;
+        const columns = canvas.width / fontSize;
+        const drops = new Array(Math.floor(columns)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+
+            for(let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+                    drops[i] = 0;
+                
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 33);
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('date').textContent = 
+                `TIME: ${now.toLocaleTimeString()} | DATE: ${now.toLocaleDateString()}`;
+        }
+        
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+
+        // Random IP address generator
+        function generateIP() {
+            const ip = Array.from({length: 4}, () => Math.floor(Math.random() * 256)).join('.');
+            document.getElementById('ipAddress').textContent = `IP: ${ip}`;
+        }
+        
+        setInterval(generateIP, 5000);
+    </script>
 </body>
 </html>
