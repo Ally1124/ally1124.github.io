@@ -1,53 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quick Links</title>
+    <title>Bag Tag OCR</title>
     <style>
+        /* Basic styling - customize as needed */
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        a, button {
-            display: block;
-            margin: 10px 0;
-            padding: 10px;
-            text-decoration: none;
-            color: white;
-            background-color: #007bff;
+            font-family: sans-serif;
             text-align: center;
-            border-radius: 5px;
         }
-        a:hover, button:hover {
-            background-color: #0056b3;
+        #video {
+            width: 640px;
+            height: 480px;
+            background-color: #ccc;
+        }
+        #canvas {
+            display: none; /* Keep canvas hidden */
         }
     </style>
 </head>
 <body>
-    <h1>Quick Links</h1>
-    <p>Use the links below to quickly access Android settings and other websites:</p>
+    <h1>Bag Tag OCR</h1>
 
-    <!-- Android Settings Links -->
-    <h2>Android Settings</h2>
-    <a href="intent:#Intent;action=android.settings.WIFI_SETTINGS;end;">Open Wi-Fi Settings</a>
-    <a href="intent:#Intent;action=android.settings.BLUETOOTH_SETTINGS;end;">Open Bluetooth Settings</a>
-    <a href="intent:#Intent;action=android.settings.BATTERY_SAVER_SETTINGS;end;">Open Battery Saver Settings</a>
-    <a href="intent:#Intent;action=android.settings.DISPLAY_SETTINGS;end;">Open Display Settings</a>
+    <video id="video" autoplay></video>
 
-    <!-- App Specific Settings -->
-    <a href="intent:#Intent;action=android.settings.APPLICATION_DETAILS_SETTINGS;package=com.android.chrome;end;">Open Chrome App Settings</a>
+    <button id="captureBtn">Capture and Recognize</button>
 
-    <!-- General Links -->
-    <h2>General Links</h2>
-    <a href="https://www.google.com" target="_blank">Visit Google</a>
-    <a href="https://www.youtube.com" target="_blank">Visit YouTube</a>
-    <a href="https://www.wikipedia.org" target="_blank">Visit Wikipedia</a>
-    <a href="https://www.github.com" target="_blank">Visit GitHub</a>
-    <a href="https://www.reddit.com" target="_blank">Visit Reddit</a>
+    <div id="ocrResult"></div>
 
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // --- Camera Access ---
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const captureBtn = document.getElementById('captureBtn');
+        const ocrResult = document.getElementById('ocrResult');
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Error accessing camera: ", err);
+                ocrResult.textContent = "Camera access error. Please grant permission.";
+            });
+
+        // --- Image Capture ---
+        function captureImage() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            return canvas.toDataURL('image/png');
+        }
+
+        // --- OCR with API (using OCR.space as an example) ---
+        function performOCR(imageData) {
+            const apiKey = 'YOUR_API_KEY'; // Replace with your OCR.space API key
+
+            fetch('https://api.ocr.space/parse/image', {
+                method: 'POST',
+                headers: {
+                    'apikey': apiKey
+                },
+                body: JSON.stringify({
+                    base64Image: imageData
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const extractedText = data.ParsedResults[0].ParsedText;
+                ocrResult.textContent = extractedText;
+            })
+            .catch(error => {
+                console.error('OCR API error:', error);
+                ocrResult.textContent = "OCR failed. Please try again.";
+            });
+        }
+
+        // --- Event Listener ---
+        captureBtn.addEventListener('click', () => {
+            const imageData = captureImage();
+            performOCR(imageData);
+        });
+    </script>
 </body>
 </html>
