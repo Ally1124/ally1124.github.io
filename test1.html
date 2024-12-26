@@ -1,87 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Bag Tag OCR</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Scanner</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
-        /* Basic styling - customize as needed */
         body {
-            font-family: sans-serif;
+            font-family: Arial, sans-serif;
             text-align: center;
+            margin: 0;
+            padding: 0;
         }
-        #video {
-            width: 640px;
-            height: 480px;
-            background-color: #ccc;
+        #scanner-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            border: 2px solid #ccc;
+            position: relative;
         }
-        #canvas {
-            display: none; /* Keep canvas hidden */
+        #camera-feed {
+            width: 100%;
+            height: auto;
+        }
+        #barcode-result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <h1>Bag Tag OCR</h1>
-
-    <video id="video" autoplay></video>
-
-    <button id="captureBtn">Capture and Recognize</button>
-
-    <div id="ocrResult"></div>
-
-    <canvas id="canvas"></canvas>
+    <h1>Interleaved 2 of 5 Barcode Scanner</h1>
+    <div id="scanner-container">
+        <div id="camera-feed"></div>
+    </div>
+    <div id="barcode-result">Scan a barcode to see the result here...</div>
 
     <script>
-        // --- Camera Access ---
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const captureBtn = document.getElementById('captureBtn');
-        const ocrResult = document.getElementById('ocrResult');
+        document.addEventListener("DOMContentLoaded", () => {
+            const resultDiv = document.getElementById("barcode-result");
 
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                video.srcObject = stream;
-            })
-            .catch(err => {
-                console.error("Error accessing camera: ", err);
-                ocrResult.textContent = "Camera access error. Please grant permission.";
-            });
-
-        // --- Image Capture ---
-        function captureImage() {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            return canvas.toDataURL('image/png');
-        }
-
-        // --- OCR with API (using OCR.space as an example) ---
-        function performOCR(imageData) {
-            const apiKey = 'YOUR_API_KEY'; // Replace with your OCR.space API key
-
-            fetch('https://api.ocr.space/parse/image', {
-                method: 'POST',
-                headers: {
-                    'apikey': apiKey
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.getElementById("camera-feed"),
+                    constraints: {
+                        facingMode: "environment" // Use the rear camera
+                    }
                 },
-                body: JSON.stringify({
-                    base64Image: imageData
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                const extractedText = data.ParsedResults[0].ParsedText;
-                ocrResult.textContent = extractedText;
-            })
-            .catch(error => {
-                console.error('OCR API error:', error);
-                ocrResult.textContent = "OCR failed. Please try again.";
+                decoder: {
+                    readers: ["interleaved_2_of_5_reader"] // Specify the Interleaved 2 of 5 reader
+                }
+            }, (err) => {
+                if (err) {
+                    console.error(err);
+                    resultDiv.textContent = "Error initializing camera: " + err;
+                    return;
+                }
+                Quagga.start();
             });
-        }
 
-        // --- Event Listener ---
-        captureBtn.addEventListener('click', () => {
-            const imageData = captureImage();
-            performOCR(imageData);
+            Quagga.onDetected((data) => {
+                const barcode = data.codeResult.code;
+                resultDiv.textContent = `Scanned Barcode: ${barcode}`;
+
+                // Automatically copy to clipboard
+                navigator.clipboard.writeText(barcode).then(() => {
+                    console.log("Barcode copied to clipboard");
+                }).catch(err => {
+                    console.error("Failed to copy barcode: ", err);
+                });
+            });
         });
     </script>
 </body>
