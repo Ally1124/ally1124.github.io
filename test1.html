@@ -11,13 +11,17 @@
             text-align: center;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f9;
         }
         #scanner-container {
             width: 100%;
             max-width: 600px;
             margin: 20px auto;
             border: 2px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
             position: relative;
+            background-color: #000;
         }
         #camera-feed {
             width: 100%;
@@ -28,6 +32,10 @@
             font-size: 1.2rem;
             font-weight: bold;
         }
+        #error-message {
+            color: red;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -36,42 +44,89 @@
         <div id="camera-feed"></div>
     </div>
     <div id="barcode-result">Scan a barcode to see the result here...</div>
+    <div id="error-message"></div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const resultDiv = document.getElementById("barcode-result");
+            const errorDiv = document.getElementById("error-message");
 
-            Quagga.init({
-                inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
-                    target: document.getElementById("camera-feed"),
-                    constraints: {
-                        facingMode: "environment" // Use the rear camera
+            function startScanner() {
+                Quagga.init({
+                    inputStream: {
+                        name: "Live",
+                        type: "LiveStream",
+                        target: document.getElementById("camera-feed"),
+                        constraints: {
+                            facingMode: "environment", // Use the rear camera
+                            width: { min: 640 },
+                            height: { min: 480 }
+                        }
+                    },
+                    decoder: {
+                        readers: ["interleaved_2_of_5_reader"] // Specify the Interleaved 2 of 5 reader
                     }
-                },
-                decoder: {
-                    readers: ["interleaved_2_of_5_reader"] // Specify the Interleaved 2 of 5 reader
-                }
-            }, (err) => {
-                if (err) {
-                    console.error(err);
-                    resultDiv.textContent = "Error initializing camera: " + err;
-                    return;
-                }
-                Quagga.start();
-            });
-
-            Quagga.onDetected((data) => {
-                const barcode = data.codeResult.code;
-                resultDiv.textContent = `Scanned Barcode: ${barcode}`;
-
-                // Automatically copy to clipboard
-                navigator.clipboard.writeText(barcode).then(() => {
-                    console.log("Barcode copied to clipboard");
-                }).catch(err => {
-                    console.error("Failed to copy barcode: ", err);
+                }, (err) => {
+                    if (err) {
+                        console.error("Initialization error: ", err);
+                        errorDiv.textContent = "Error initializing camera. Please check your permissions and refresh the page.";
+                        return;
+                    }
+                    Quagga.start();
                 });
+
+                Quagga.onProcessed((result) => {
+                    const drawingCtx = Quagga.canvas.ctx.overlay;
+                    const drawingCanvas = Quagga.canvas.dom.overlay;
+
+                    if (result) {
+                        drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+                        if (result.boxes) {
+                            result.boxes.filter((box) => box !== result.box).forEach((box) => {
+                                Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, {
+                                    color: "green",
+                                    lineWidth: 2
+                                });
+                            });
+                        }
+                        if (result.box) {
+                            Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, {
+                                color: "blue",
+                                lineWidth: 2
+                            });
+                        }
+                        if (result.codeResult && result.codeResult.code) {
+                            resultDiv.textContent = `Scanned Barcode: ${result.codeResult.code}`;
+
+                            // Automatically copy to clipboard
+                            navigator.clipboard.writeText(result.codeResult.code).then(() => {
+                                console.log("Barcode copied to clipboard");
+                            }).catch(err => {
+                                console.error("Failed to copy barcode: ", err);
+                            });
+                        }
+                    }
+                });
+
+                Quagga.onDetected((data) => {
+                    const barcode = data.codeResult.code;
+                    resultDiv.textContent = `Scanned Barcode: ${barcode}`;
+
+                    // Automatically copy to clipboard
+                    navigator.clipboard.writeText(barcode).then(() => {
+                        console.log("Barcode copied to clipboard");
+                    }).catch(err => {
+                        console.error("Failed to copy barcode: ", err);
+                    });
+                });
+            }
+
+            // Check for camera permissions and compatibility
+            navigator.mediaDevices.getUserMedia({ video: true }).then(() => {
+                startScanner();
+            }).catch((err) => {
+                console.error("Camera access denied or unavailable: ", err);
+                errorDiv.textContent = "Unable to access the camera. Please allow camera permissions and refresh the page.";
             });
         });
     </script>
