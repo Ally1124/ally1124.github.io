@@ -1,146 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal Barcode Scanner</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-        }
-        #scanner-container {
-            width: 100%;
-            max-width: 600px;
-            margin: 20px auto;
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            background-color: #000;
-        }
-        #camera-feed {
-            width: 100%;
-            height: auto;
-        }
-        #barcode-result {
-            margin-top: 20px;
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-        #error-message {
-            color: red;
-            margin-top: 10px;
-        }
-    </style>
+<title>Barcode Scanner</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  font-family: sans-serif;
+}
+#barcode-scanner {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+#interactive {
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+video {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+}
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+</style>
 </head>
 <body>
-    <h1>Universal Barcode Scanner</h1>
-    <div id="scanner-container">
-        <div id="camera-feed"></div>
-    </div>
-    <div id="barcode-result">Scan a barcode to see the result here...</div>
-    <div id="error-message"></div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const resultDiv = document.getElementById("barcode-result");
-            const errorDiv = document.getElementById("error-message");
+<h1>Barcode Scanner</h1>
 
-            function startScanner() {
-                Quagga.init({
-                    inputStream: {
-                        name: "Live",
-                        type: "LiveStream",
-                        target: document.getElementById("camera-feed"),
-                        constraints: {
-                            facingMode: "environment", // Use the rear camera
-                            width: { min: 640 },
-                            height: { min: 480 }
-                        }
-                    },
-                    decoder: {
-                        readers: [
-                            "code_128_reader",
-                            "ean_reader",
-                            "ean_8_reader",
-                            "code_39_reader",
-                            "code_39_vin_reader",
-                            "codabar_reader",
-                            "upc_reader",
-                            "upc_e_reader",
-                            "i2of5_reader",
-                            "2of5_reader",
-                            "interleaved_2_of_5_reader"
-                        ] // Support for multiple barcode types
-                    }
-                }, (err) => {
-                    if (err) {
-                        console.error("Initialization error: ", err);
-                        errorDiv.textContent = "Error initializing camera. Please check your permissions and refresh the page.";
-                        return;
-                    }
-                    Quagga.start();
-                });
+<div id="barcode-scanner">
+  <div id="interactive">
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+  </div>
+  <p id="result"></p>
+  <button id="copy-button">Copy to Clipboard</button>
+</div>
 
-                Quagga.onProcessed((result) => {
-                    const drawingCtx = Quagga.canvas.ctx.overlay;
-                    const drawingCanvas = Quagga.canvas.dom.overlay;
+<script type="text/javascript" src="https://unpkg.com/@zxing/library@latest"></script>
+<script>
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const result = document.getElementById('result');
+  const copyButton = document.getElementById('copy-button');
 
-                    if (result) {
-                        drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-                        if (result.boxes) {
-                            result.boxes.filter((box) => box !== result.box).forEach((box) => {
-                                Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, {
-                                    color: "green",
-                                    lineWidth: 2
-                                });
-                            });
-                        }
-                        if (result.box) {
-                            Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, {
-                                color: "blue",
-                                lineWidth: 2
-                            });
-                        }
-                        if (result.codeResult && result.codeResult.code) {
-                            resultDiv.textContent = `Scanned Barcode: ${result.codeResult.code}`;
+  // Initialize the barcode reader
+  const codeReader = new ZXing.BrowserMultiFormatReader();
 
-                            // Automatically copy to clipboard
-                            navigator.clipboard.writeText(result.codeResult.code).then(() => {
-                                console.log("Barcode copied to clipboard");
-                            }).catch(err => {
-                                console.error("Failed to copy barcode: ", err);
-                            });
-                        }
-                    }
-                });
+  // Request access to the user's camera
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+    .then(function(stream) {
+      video.srcObject = stream;
+      video.play();
 
-                Quagga.onDetected((data) => {
-                    const barcode = data.codeResult.code;
-                    resultDiv.textContent = `Scanned Barcode: ${barcode}`;
+      // Start decoding frames from the video stream
+      decodeContinuously();
+    })
+    .catch(function(err) {
+      console.error("Error accessing camera: ", err);
+      result.textContent = "Error accessing camera.";
+    });
 
-                    // Automatically copy to clipboard
-                    navigator.clipboard.writeText(barcode).then(() => {
-                        console.log("Barcode copied to clipboard");
-                    }).catch(err => {
-                        console.error("Failed to copy barcode: ", err);
-                    });
-                });
-            }
+  function decodeContinuously() {
+    try {
+      codeReader.decodeFromVideoDevice(null, video, (data, err) => {
+        if (data) {
+          // Barcode detected!
+          result.textContent = "Barcode: " + data.text;
+          copyButton.disabled = false; // Enable copy button
+        } else {
+          // No barcode found, try again
+          requestAnimationFrame(decodeContinuously);
+        }
+      });
+    } catch (err) {
+      console.error("Error decoding barcode: ", err);
+      result.textContent = "Error decoding barcode.";
+    }
+  }
 
-            // Check for camera permissions and compatibility
-            navigator.mediaDevices.getUserMedia({ video: true }).then(() => {
-                startScanner();
-            }).catch((err) => {
-                console.error("Camera access denied or unavailable: ", err);
-                errorDiv.textContent = "Unable to access the camera. Please allow camera permissions and refresh the page.";
-            });
-        });
-    </script>
+  copyButton.addEventListener('click', () => {
+    navigator.clipboard.writeText(result.textContent.replace("Barcode: ", ""))
+      .then(() => {
+        alert('Barcode copied to clipboard!');
+      })
+      .catch(err => {
+        console.error("Failed to copy: ", err);
+      });
+  });
+</script>
+
 </body>
 </html>
