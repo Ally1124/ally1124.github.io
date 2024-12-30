@@ -7,7 +7,7 @@
 <style>
 body {
   font-family: sans-serif;
-  text-align: center; /* Center content */
+  text-align: center;
 }
 #barcode-scanner {
   width: 100%;
@@ -17,19 +17,21 @@ body {
 #interactive {
   padding: 20px;
   border: 1px solid #ccc;
-  position: relative; /* For positioning the loader */
+  position: relative;
 }
 video {
   width: 100%;
   max-width: 400px;
   height: auto;
 }
-#loader {
+#loader, #start-button {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  display: none; /* Hidden by default */
+}
+#loader {
+  display: none; 
 }
 button {
   margin-top: 10px;
@@ -48,9 +50,10 @@ button {
 
 <div id="barcode-scanner">
   <div id="interactive">
-    <video id="video" width="640" height="480" autoplay muted></video>
+    <video id="video" width="640" height="480" autoplay muted playsinline></video>
     <canvas id="canvas" width="640" height="480"></canvas>
-    <div id="loader">Loading camera...</div> </div>
+    <div id="loader">Loading camera...</div> 
+  </div>
   <p id="result"></p>
   <button id="copy-button" disabled>Copy to Clipboard</button>
 </div>
@@ -65,44 +68,34 @@ button {
 
   // Initialize the barcode reader
   const codeReader = new ZXing.BrowserMultiFormatReader();
-  codeReader.getVideoInputDevices()
-    .then((videoInputDevices) => {
-      // Choose the back camera (environment-facing) if available
-      const selectedDeviceId = videoInputDevices.find(device => device.label.toLowerCase().includes('back')).deviceId || videoInputDevices[0].deviceId;
 
-      // Request access to the user's camera
-      return navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          deviceId: { exact: selectedDeviceId },
-          facingMode: { ideal: "environment" } // Prioritize environment-facing
-        } 
-      });
-    })
-    .then(function(stream) {
-      video.srcObject = stream;
-      // Add an event listener for when the video metadata is loaded
-      video.onloadedmetadata = function() {
-        video.play();
-        loader.style.display = 'none'; // Hide loader
-        decodeContinuously();
-      };
-    })
-    .catch(function(err) {
-      console.error("Error accessing camera: ", err);
-      result.textContent = "Error accessing camera.";
-      loader.style.display = 'none'; // Hide loader
-    });
+  // Request camera access immediately
+  navigator.mediaDevices.getUserMedia({ 
+    video: { 
+      facingMode: { ideal: "environment" } 
+    } 
+  })
+  .then(function(stream) {
+    video.srcObject = stream;
+    video.onloadedmetadata = function() {
+      video.play();
+      decodeContinuously(); // Start decoding immediately
+    };
+  })
+  .catch(function(err) {
+    console.error("Error accessing camera: ", err);
+    result.textContent = "Error accessing camera.";
+    loader.style.display = 'none';
+  });
 
   function decodeContinuously() {
     try {
       codeReader.decodeFromVideoDevice(null, video, (data, err) => {
         if (data) {
-          // Barcode detected!
           result.textContent = "Barcode: " + data.text;
-          copyButton.disabled = false; // Enable copy button
+          copyButton.disabled = false;
         } else {
-          // No barcode found, try again after a short delay
-          setTimeout(decodeContinuously, 300); // Adjust delay as needed
+          setTimeout(decodeContinuously, 300);
         }
       });
     } catch (err) {
