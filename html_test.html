@@ -1,241 +1,207 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AA Boarding Pass Parser</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-        body {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #f0f2f5;
-        }
-        .container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 25px;
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #0078D2;
-        }
-        .title {
-            color: #0078D2;
-            margin: 0;
-            font-size: 24px;
-        }
-        .aa-logo {
-            color: #0078D2;
-            font-weight: bold;
-            font-size: 28px;
-        }
-        textarea {
-            width: 100%;
-            height: 100px;
-            margin: 10px 0;
-            padding: 15px;
-            font-family: monospace;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            resize: none;
-        }
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-        .parse-btn {
-            background: #0078D2;
-            color: white;
-        }
-        .clear-btn {
-            background: #f0f0f0;
-            color: #333;
-        }
-        button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .result {
-            display: none;
-            background: white;
-            border: 2px solid #0078D2;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        .field {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-            position: relative;
-        }
-        .field:last-child {
-            border-bottom: none;
-        }
-        .field:hover {
-            background-color: #f8f9fa;
-        }
-        .label {
-            width: 250px;
-            font-weight: bold;
-            color: #0078D2;
-        }
-        .value {
-            flex: 1;
-        }
-        .copy-btn {
-            background: transparent;
-            color: #0078D2;
-            padding: 5px 10px;
-            font-size: 12px;
-            border: 1px solid #0078D2;
-            border-radius: 4px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        .field:hover .copy-btn {
-            opacity: 1;
-        }
-        .copy-btn:hover {
-            background: #0078D2;
-            color: white;
-        }
-        .success-message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 4px;
-            display: none;
-        }
-    </style>
+  <title>Aviation hub</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to right, #e0eafc, #cfdef3); 
+      margin: 0;
+      padding: 0;
+      color: #333; 
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2196F3; 
+      margin-bottom: 20px; 
+    }
+
+    h2 {
+      color: #2196F3; 
+    }
+
+    .search-area {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 300px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); 
+    }
+
+    button[type="submit"] {
+      padding: 10px;
+      background-color: #2196F3; 
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: background-color 0.3s ease; 
+    }
+
+    button[type="submit"]:hover {
+      background-color: #1976D2; 
+    }
+
+    .link-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .link-group a {
+      display: block;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #333;
+      text-align: center;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
+    }
+
+    .link-group a:hover {
+      background-color: #f0f0f0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+    }
+
+    .time-section {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 4px;
+      background-color: #f9f9f9; 
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .time-entry {
+      margin-bottom: 8px;
+      font-size: 1.1em;
+    }
+
+    #flight-number, #tracking-service {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-right: 10px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    #tracking-service {
+      width: 150px; 
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 class="title">Boarding Pass Parser</h1>
-            <div class="aa-logo">AA</div>
-        </div>
-        
-        <textarea placeholder="Paste your boarding pass data here..."></textarea>
-        
-        <div class="button-group">
-            <button class="parse-btn" onclick="parse()">Parse Data</button>
-            <button class="clear-btn" onclick="clearAll()">Clear</button>
-        </div>
-        
-        <div class="result" id="result"></div>
+  <div class="container">
+    <h1>Aviation hub</h1>
+
+    <div class="search-area">
+      <form action="https://www.google.com/search" method="get" target="_blank">
+        <input type="text" name="q" placeholder="Search Google">
+        <button type="submit">Search</button>
+      </form>
+      <a href="https://www.google.com/advanced_search?q=googlr&ie=UTF-8&ptid=19034382&ptt=8&fpts=1736046378892" target="_blank" style="margin-left: 10px;">Advanced Search</a>
     </div>
-    
-    <div class="success-message" id="copyMessage">Copied to clipboard!</div>
 
-    <script>
-        function parse() {
-            const input = document.querySelector('textarea').value.trim();
-            const result = document.getElementById('result');
-            
-            try {
-                const parts = input.split(' ').filter(part => part.length > 0);
-                
-                const data = {
-                    formatCode: input.charAt(0),
-                    legs: input.charAt(1),
-                    passengerName: input.substring(2, input.indexOf('.')).trim(),
-                    ticketType: 'E',
-                    recordLocator: parts.find(p => p.startsWith('E')).substring(1),
-                    fromAirport: parts.find(p => p.includes('AA')).substring(0, 3),
-                    toAirport: parts.find(p => p.includes('AA')).substring(3, 6),
-                    airline: 'AA',
-                    flightNumber: parts.find(p => /^\d{4}$/.test(p)),
-                    julianDate: parts.find(p => p.includes('C')).substring(0, 3),
-                    compartment: 'C',
-                    seat: parts.find(p => p.includes('C')).substring(4, 8),
-                    sequence: '0239',
-                    status: '1',
-                    ffNumber: input.substring(input.lastIndexOf('AA') + 3).trim()
-                };
+    <h2>Track Flight</h2>
+    <div>
+      <input type="text" id="flight-number" placeholder="Enter flight number (e.g., 1996)">
+      <select id="tracking-service">
+        <option value="flightradar24">FlightRadar24</option>
+        <option value="flightaware">FlightAware</option>
+      </select>
+      <button onclick="openFlightTracker()">Track</button>
+    </div>
 
-                const julianToDate = (julian) => {
-                    const year = new Date().getFullYear();
-                    const date = new Date(year, 0);
-                    date.setDate(parseInt(julian));
-                    return date.toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric'
-                    });
-                };
+    <div class="link-group">
+      <h3>AI Chat</h3>
+      <a href="https://chat.openai.com/" target="_blank">ChatGPT</a>
+      <a href="https://claude.ai/" target="_blank">Claude</a> 
+    </div>
 
-                const fields = [
-                    ['Format code', data.formatCode],
-                    ['Number of legs encoded', data.legs],
-                    ['Passenger name', data.passengerName],
-                    ['Electronic Ticket Indicator', data.ticketType],
-                    ['Record locator', data.recordLocator],
-                    ['From airport code', data.fromAirport],
-                    ['To airport code', data.toAirport],
-                    ['Airline code', data.airline],
-                    ['Flight number', data.flightNumber],
-                    ['Date Of Flight (Julian Date)', `${data.julianDate} (${julianToDate(data.julianDate)})`],
-                    ['Compartment Code', data.compartment],
-                    ['Seat number', data.seat],
-                    ['Check-In Sequence Number', data.sequence],
-                    ['Passenger Status', data.status],
-                    ['Frequent Flyer Number', data.ffNumber]
-                ];
 
-                result.innerHTML = fields.map(([label, value]) => `
-                    <div class="field">
-                        <div class="label">${label}</div>
-                        <div class="value">${value}</div>
-                        <button class="copy-btn" onclick="copyToClipboard('${value}')">Copy</button>
-                    </div>
-                `).join('');
-                
-                result.style.display = 'block';
-            } catch (error) {
-                result.innerHTML = `<div style="color: red;">Unable to parse boarding pass. Please make sure you've pasted the complete data.</div>`;
-                result.style.display = 'block';
-            }
-        }
+    <div class="link-group">
+      <h3>American Airlines Links</h3>
+      <a href="https://webmail.aa.com/" target="_blank">Email</a>
+      <a href="https://teams.microsoft.com/v2/" target="_blank">Teams</a>
+      <a href="https://airportal.aa.com/" target="_blank">Airportal</a>
+      <a href="https://spteam.aa.com/sites/D5B/SiteAssets/Forms/AllItems.aspx?id=%2Fsites%2FD5B%2FSiteAssets%2FSitePages%2FTopicHome%281%29%2F4036318324DFW%2DBag%2DMovement%2DContingency%2DFinal%2DCopy%2Epdf&parent=%2Fsites%2FD5B%2FSiteAssets%2FSitePages%2FTopicHome%281%29" target="_blank">Baggage Contingency Plan</a>
+      <a href="https://spteam.aa.com/sites/D5B/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FD5B%2FShared%20Documents%2FABR%20Ops%2FTWU%2FFleet%20Service%20JCBA%20TA%20final%203%2D9%2D2020%2Epdf&parent=%2Fsites%2FD5B%2FShared%20Documents%2FABR%20Ops%2FTWU" target="_blank">UNION CBA</a>
+      <a href="https://app.powerbi.com/groups/me/apps/329a2051-48be-439d-82fe-56dec90523c7/reports/494276d2-cbb1-4fb2-a791-f2b1cd533787/ReportSectiond139402f12d80b83cdd2?experience=power-bi" target="_blank">Reroute / Wheelchair Dashboard</a>
+      <a href="https://get.aa.com/" target="_blank">GET</a>
+      <a href="https://spteam.aa.com/sites/DFWROC" target="_blank">ROC Tower Site</a>
+      <a href="https://spteam.aa.com/sites/D5B" target="_blank">ABR Site</a>
+    </div>
 
-        function clearAll() {
-            document.querySelector('textarea').value = '';
-            document.getElementById('result').style.display = 'none';
-        }
+    <h2>Current Times</h2>
+    <div class="time-section">
+      <div class="time-entry" id="local-time"></div>
+      <div class="time-entry" id="zulu-time"></div>
+      <div class="time-entry" id="sofia-time"></div>
+      <div class="time-entry" id="lax-time"></div>
+      <div class="time-entry" id="japan-time"></div>
+    </div>
 
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                const message = document.getElementById('copyMessage');
-                message.style.display = 'block';
-                setTimeout(() => {
-                    message.style.display = 'none';
-                }, 2000);
-            });
-        }
-    </script>
+  </div>
+
+  <script>
+    function updateTimes() {
+      const now = new Date();
+      const options = { timeZone: 'UTC', hour12: false, hour: '2-digit', minute:'2-digit' };
+      
+      document.getElementById('local-time').textContent = 
+        "Local Time (Dallas): " + now.toLocaleTimeString('en-US'); 
+      document.getElementById('zulu-time').textContent = 
+        "Zulu Time: " + now.toLocaleTimeString('en-US', options);
+      document.getElementById('sofia-time').textContent = 
+        "Sofia, Bulgaria: " + now.toLocaleTimeString('en-US', { timeZone: 'Europe/Sofia', hour12: false, hour: '2-digit', minute:'2-digit' });
+      document.getElementById('lax-time').textContent = 
+        "Los Angeles: " + now.toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour12: false, hour: '2-digit', minute:'2-digit' });
+      document.getElementById('japan-time').textContent = 
+        "Japan: " + now.toLocaleTimeString('en-US', { timeZone: 'Asia/Tokyo', hour12: false, hour: '2-digit', minute:'2-digit' }); 
+    }
+
+    setInterval(updateTimes, 1000); 
+    updateTimes(); 
+
+
+    function openFlightTracker() {
+      const flightNumber = document.getElementById('flight-number').value;
+      const service = document.getElementById('tracking-service').value;
+
+      let url;
+      switch (service) {
+        case 'flightradar24':
+          url = `https://www.flightradar24.com/AAL${flightNumber}`;
+          break;
+        case 'flightaware':
+          url = `https://flightaware.com/live/flight/AAL${flightNumber}`;
+          break;
+        default:
+          return; 
+      }
+
+      window.open(url, '_blank');
+    }
+  </script>
 </body>
 </html>
