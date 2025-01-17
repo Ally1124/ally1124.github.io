@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Device Information</title>
+<style>
+body {
+  font-family: sans-serif;
+}
+table {
+  border-collapse: collapse;
+  width: 50%;
+  margin: 20px auto;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+th {
+  background-color: #f2f2f2;
+}
+</style>
+</head>
+<body>
+
+<h1>Device Information</h1>
+
+<table>
+  <tr>
+    <th>Data Point</th>
+    <th>Value</th>
+  </tr>
+  <tr>
+    <td>Operating System</td>
+    <td><script>document.write(navigator.platform);</script></td>
+  </tr>
+  <tr>
+    <td>IP Address</td>
+    <td><div id="ip_address">Loading...</div></td>
+  </tr>
+  <tr>
+    <td>Javascript Enabled</td>
+    <td><script>document.write(navigator.javaEnabled() ? "Yes" : "No");</script></td>
+  </tr>
+  <tr>
+    <td>Cookies Enabled</td>
+    <td><script>document.write(navigator.cookieEnabled ? "Yes" : "No");</script></td>
+  </tr>
+  <tr>
+    <td>Flash Version</td>
+    <td><div id="flash_version"></div></td>
+  </tr>
+  <tr>
+    <td>Java Version</td>
+    <td><div id="java_version"></div></td>
+  </tr>
+  <tr>
+    <td>WebSockets Supported</td>
+    <td><script>document.write(window.WebSocket ? "Yes" : "No");</script></td>
+  </tr>
+  <tr>
+    <td>WebGL Supported</td>
+    <td><script>document.write(detectWebGL() ? "Yes" : "No");</script></td>
+  </tr>
+  <tr>
+    <td>Browser</td>
+    <td><script>document.write(navigator.appName);</script></td>
+  </tr>
+  <tr>
+    <td>Browser Version</td>
+    <td><script>document.write(navigator.appVersion);</script></td>
+  </tr>
+  <tr>
+    <td>Language</td>
+    <td><script>document.write(navigator.language);</script></td>
+  </tr>
+  <tr>
+    <td>Browser Size</td>
+    <td><script>document.write(window.innerWidth + " x " + window.innerHeight);</script></td>
+  </tr>
+  <tr>
+    <td>Screen Size</td>
+    <td><script>document.write(screen.width + " x " + screen.height);</script></td>
+  </tr>
+  <tr>
+    <td>Color Depth</td>
+    <td><script>document.write(screen.colorDepth + " bits");</script></td>
+  </tr>
+  <tr>
+    <td>Encoding</td>
+    <td><script>document.write(document.characterSet);</script></td>
+  </tr>
+  <tr>
+    <td>Connection Type</td>
+    <td><script>
+      if (navigator.connection) {
+        document.write(navigator.connection.effectiveType);
+      } else {
+        document.write("Unknown");
+      }
+    </script></td>
+  </tr>
+  <tr>
+    <td>Keep Alive Enabled</td>
+    <td><script>document.write(navigator.sendBeacon ? "Yes" : "No");</script></td>
+  </tr>
+  <tr>
+    <td>Battery Level</td>
+    <td><div id="battery"></div></td> 
+  </tr>
+  <tr>
+    <td>CPU Cores</td>
+    <td><script>document.write(navigator.hardwareConcurrency);</script></td>
+  </tr>
+  <tr>
+    <td>Geolocation</td>
+    <td><button onclick="getGeolocation()">Get Geolocation</button>
+        <div id="geolocation"></div>
+    </td>
+  </tr>
+  <tr>
+    <td>Installed Plugins</td>
+    <td><script>
+      var plugins = navigator.plugins;
+      if (plugins.length > 0) {
+        for (var i = 0; i < plugins.length; i++) {
+          document.write(plugins[i].name + "<br>");
+        }
+      } else {
+        document.write("No plugins detected");
+      }
+    </script></td>
+  </tr>
+</table>
+
+<p>Note: Some information may require user permission or may not be available in all browsers.</p>
+
+<script>
+// IP Address (requires external service)
+fetch('https://api.ipify.org?format=json')
+  .then(response => response.json())
+  .then(data => document.getElementById("ip_address").innerHTML = data.ip)
+  .catch(error => document.getElementById("ip_address").innerHTML = "Error fetching IP");
+
+// Flash Version
+var flashVersion = getFlashVersion();
+document.getElementById("flash_version").innerHTML = flashVersion ? flashVersion : "Not detected";
+
+function getFlashVersion() {
+  try {
+    try {
+      // Avoid fp64 "toString" bug in Chrome v45
+      var flash = new ActiveXObject('ShockwaveFlash.ShockwaveFlash.6');
+      flash.AllowScriptAccess = 'always';
+      return flash.GetVariable('$version').replace(/\D+/g, ',').match(/^,?(.+),?$/)[1];
+    } catch (e) {
+      try {
+        var flash = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
+        return flash.GetVariable('$version').replace(/\D+/g, ',').match(/^,?(.+),?$/)[1];
+      } catch (e) {
+        throw "Error detecting Flash version";
+      }
+    }
+  } catch (e) {
+    return null;
+  }
+}
+
+// Java Version
+var javaVersion = getJavaVersion();
+document.getElementById("java_version").innerHTML = javaVersion ? javaVersion : "Not detected";
+
+function getJavaVersion() {
+  try {
+    var java = navigator.javaEnabled() ? getJavaPlugin().version : null;
+    return java;
+  } catch (e) {
+    return null;
+  }
+}
+
+function getJavaPlugin() {
+  for (var i = 0; i < navigator.plugins.length; i++) {
+    if (navigator.plugins[i].name.indexOf("Java") !== -1) {
+      return navigator.plugins[i];
+    }
+  }
+  return null;
+}
+
+// WebGL Supported
+function detectWebGL() {
+  // Create canvas element. The canvas is not added to the
+  // document itself, so these context creation calls don't
+  // trigger an automatic insertion of the canvas into the document.
+  var canvas = document.createElement("canvas");
+  var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+  return gl != null;
+}
+
+// Battery level (needs to be outside the table to work correctly)
+if (navigator.getBattery) {
+  navigator.getBattery().then(function(battery) {
+    document.getElementById("battery").innerHTML = Math.round(battery.level * 100) + "%";
+  });
+} else {
+  document.getElementById("battery").innerHTML = "Not supported";
+}
+
+function getGeolocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition, showError);
+  } else { 
+    document.getElementById("geolocation").innerHTML = "Geolocation is not supported by this browser.";
+  }
+}
+
+function showPosition(position) {
+  document.getElementById("geolocation").innerHTML = "Latitude: " + position.coords.latitude + 
+  "<br>Longitude: " + position.coords.longitude;
+}
+
+function showError(error) {
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      document.getElementById("geolocation").innerHTML = "User denied the request for Geolocation."
+      break;
+    case error.POSITION_UNAVAILABLE:
+      document.getElementById("geolocation").innerHTML = "Location information is unavailable."
+      break;
+    case error.TIMEOUT:
+      document.getElementById("geolocation").innerHTML = "The request to get user location timed out."
+      break;
+    case error.UNKNOWN_ERROR:
+      document.getElementById("geolocation").innerHTML = "An unknown error occurred."
+      break;
+  }
+}
+</script>
+
+</body>
+</html>
