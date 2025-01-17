@@ -1,245 +1,291 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Aviation Homepage</title>
-  <style>
-    :root {
-      --primary-color: #2196F3;
-      --secondary-color: #1976D2;
-      --text-color: #333;
-      --background-color: #e0eafc;
-      --card-bg-color: #fff;
-      --shadow-color: rgba(0, 0, 0, 0.2);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AV Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #DE1B23;
+            --secondary-color: #1976D2;
+            --text-color: #333; 
+            --background-color: #e0eafc;
+            --card-bg-color: #fff;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            --link-color: #2196F3; 
+            --link-hover-color: #fff;
+            --card-text-color: #333;
+            --border-color: #ddd; /* Light gray border */
+        }
 
-    [data-theme="dark"] {
-      --primary-color: #90caf9;
-      --secondary-color: #64b5f6;
-      --text-color: #e0e0e0;
-      --background-color: #121212;
-      --card-bg-color: #1e1e1e;
-      --shadow-color: rgba(0, 0, 0, 0.5);
-    }
+        [data-theme="dark"] {
+            --primary-color: #DE1B23;
+            --secondary-color: #64b5f6;
+            --text-color: #e0e0e0;
+            --background-color: #121212;
+            --card-bg-color: #1e1e1e;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --link-color: #90caf9; 
+            --link-hover-color: #ffffff;
+            --card-text-color: #fff; 
+            --border-color: #555; /* Darker gray border */
+        }
 
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: var(--background-color);
-      color: var(--text-color);
-      margin: 0;
-      padding: 0;
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
 
-    header {
-      background-color: var(--primary-color);
-      color: #fff;
-      padding: 10px 20px;
-      text-align: center;
-    }
+        header {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
 
-    .container {
-      max-width: 960px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: var(--card-bg-color);
-      box-shadow: 0 2px 5px var(--shadow-color);
-      border-radius: 8px;
-    }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-gap: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
 
-    .theme-toggle {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-    }
+        .card {
+            background-color: var(--card-bg-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            padding: 20px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+            color: var(--card-text-color);
+        }
 
-    .theme-toggle button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      background-color: var(--primary-color);
-      color: #fff;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
+        .card:hover {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
 
-    .theme-toggle button:hover {
-      background-color: var(--secondary-color);
-    }
+        .card:hover a {
+            color: var(--link-hover-color);
+        }
 
-    .greeting {
-      font-size: 1.2em;
-      margin: 10px 0;
-      text-align: center;
-    }
+        .card h2 {
+            color: var(--card-text-color);
+            margin-bottom: 10px;
+            text-align: center;
+        }
 
-    .search-area, .flight-tracker, .weather-section, .news-section, .link-group {
-      margin-top: 20px;
-    }
+        .card a {
+            text-decoration: none;
+            color: var(--link-color);
+        }
 
-    input[type="text"] {
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      width: 300px;
-    }
+        .theme-toggle {
+            grid-column: span 2;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
 
-    button {
-      padding: 10px;
-      background-color: var(--primary-color);
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
+        .theme-toggle button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--primary-color);
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
 
-    button:hover {
-      background-color: var(--secondary-color);
-    }
+        .theme-toggle button:hover {
+            background-color: var(--secondary-color);
+        }
 
-    a {
-      text-decoration: none;
-      color: var(--primary-color);
-    }
+        .greeting {
+            grid-column: span 2;
+            font-size: 1.2em;
+            margin: 10px 0;
+            text-align: center;
+        }
 
-    a:hover {
-      color: var(--secondary-color);
-    }
+        .search-area form,
+        .flight-tracker,
+        .news-section ul {
+            text-align: center;
+        }
 
-    .link-group {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-    }
+        .news-section li {
+            list-style: none;
+            margin-bottom: 5px;
+        }
 
-    .link-group a {
-      padding: 15px;
-      background-color: var(--card-bg-color);
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      text-align: center;
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    }
+        /* Responsive design improvements */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
 
-    .link-group a:hover {
-      background-color: var(--primary-color);
-      color: #fff;
-      box-shadow: 0 2px 5px var(--shadow-color);
-    }
-  </style>
+            .theme-toggle,
+            .greeting {
+                grid-column: span 1;
+            }
+        }
+
+        /* Modern Input Fields */
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color); /* Use border color variable */
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(222, 27, 35, 0.5); /* Subtle shadow on focus */
+        }
+
+        .flight-tracker input[type="text"] {
+            width: 48%;
+        }
+    </style>
 </head>
-<body>
-  <header>
-    <h1>Welcome to My Aviation Homepage</h1>
-  </header>
+<body data-theme="dark"> 
+    <header>
+        <h1>AV Hub</h1>
+    </header>
 
-  <div class="container">
-    <div class="theme-toggle">
-      <button onclick="toggleTheme()">Toggle Dark Mode</button>
+    <div class="container">
+        <div class="theme-toggle">
+            <button onclick="toggleTheme()">Toggle Light Mode</button> 
+        </div>
+
+        <div class="greeting" id="greeting"></div>
+
+        <div class="card">
+            <h2>Search the Web</h2>
+            <form id="google-search-form" onsubmit="submitGoogleSearch(event)"> 
+                <input type="text" name="q" placeholder="Search Google" id="google-search-box" autocomplete="off"> 
+                <button type="submit">Search</button>
+            </form>
+            <div style="margin-top: 10px;">
+                <a href="https://www.google.com/advanced_search" target="_blank">Advanced Search</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Track Your Flight</h2>
+            <form id="flight-tracker-form" onsubmit="openFlightTracker(event)">
+                <input type="text" id="airline-code" value="AAL" placeholder="Airline Code">
+                <input type="text" id="flight-number" placeholder="Flight Number">
+                <select id="tracking-service">
+                    <option value="flightradar24">FlightRadar24</option>
+                    <option value="flightaware">FlightAware</option>
+                </select>
+                <button type="submit">Track</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Current Weather at DFW</h2>
+            <div id="weather-info">Fetching weather...</div>
+        </div>
+
+        <div class="card">
+            <h2>Aviation News</h2>
+            <ul>
+                <li><a href="https://www.flightglobal.com/" target="_blank">FlightGlobal</a></li>
+                <li><a href="https://www.avweb.com/" target="_blank">AVweb</a></li>
+                <li><a href="https://simpleflying.com/" target="_blank">Simple Flying</a></li>
+                <li><a href="https://www.airliners.net/" target="_blank">Airliners.net</a></li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Quick Links</h2>
+            <a href="https://chat.openai.com/" target="_blank">ChatGPT</a><br>
+            <a href="https://webmail.aa.com/" target="_blank">Email</a><br>
+            <a href="https://teams.microsoft.com/" target="_blank">Teams</a><br>
+            <a href="https://airportal.aa.com/" target="_blank">Airportal</a><br>
+            <a href="https://spteam.aa.com/sites/D5B" target="_blank">DFW ABR Site</a><br>
+            <a href="https://www.aa.com/flight-status/" target="_blank">AA.com Flight Status</a><br>
+            <a href="https://www.aa.com/baggage/bag-tag-lookup" target="_blank">Bag Tag Lookup</a>
+        </div>
     </div>
 
-    <div class="greeting" id="greeting"></div>
+    <script>
+        const API_KEY = '3aaca9925662e52771fac9ab848724e7'; 
+        const DFW_LAT = 32.8998;
+        const DFW_LON = -97.0403;
 
-    <div class="search-area">
-      <h2>Search the Web</h2>
-      <form action="https://www.google.com/search" method="get" target="_blank">
-        <input type="text" name="q" placeholder="Search Google">
-        <button type="submit">Search</button>
-      </form>
-      <div style="margin-top: 10px; text-align: center;">
-        <a href="https://www.google.com/advanced_search" target="_blank">Advanced Search</a>
-      </div>
-    </div>
+        function toggleTheme() {
+            const theme = document.body.getAttribute('data-theme');
+            document.body.setAttribute('data-theme', theme === 'dark' ? '' : 'dark');
+        }
 
-    <div class="flight-tracker">
-      <h2>Track Your Flight</h2>
-      <input type="text" id="flight-number" placeholder="Enter flight number">
-      <select id="tracking-service">
-        <option value="flightradar24">FlightRadar24</option>
-        <option value="flightaware">FlightAware</option>
-      </select>
-      <button onclick="openFlightTracker()">Track</button>
-    </div>
+        function submitGoogleSearch(event) {
+            event.preventDefault(); 
+            const searchTerm = document.getElementById('google-search-box').value;
+            window.open(`https://www.google.com/search?q=${searchTerm}`, '_blank');
+        }
 
-    <div class="weather-section">
-      <h2>Current Weather at DFW Airport</h2>
-      <div id="weather-info">Fetching weather...</div>
-    </div>
+        function openFlightTracker(event) {
+            event.preventDefault(); 
+            const airlineCode = document.getElementById('airline-code').value;
+            const flightNumber = document.getElementById('flight-number').value;
+            const service = document.getElementById('tracking-service').value;
+            const url = service === 'flightradar24'
+                ? `https://www.flightradar24.com/${airlineCode}${flightNumber}`
+                : `https://flightaware.com/live/flight/${airlineCode}${flightNumber}`;
+            window.open(url, '_blank');
+        }
 
-    <div class="news-section">
-      <h2>Aviation News</h2>
-      <ul id="news-list">
-        <li><a href="https://www.flightglobal.com/" target="_blank">FlightGlobal</a></li>
-        <li><a href="https://www.avweb.com/" target="_blank">AVweb</a></li>
-        <li><a href="https://simpleflying.com/" target="_blank">Simple Flying</a></li>
-      </ul>
-    </div>
+        function setGreeting() {
+            const now = new Date();
+            const hours = now.getHours();
+            let greeting = "Welcome!";
+            if (hours < 12) greeting = "Good Morning!";
+            else if (hours < 18) greeting = "Good Afternoon!";
+            else greeting = "Good Evening!";
 
-    <div class="link-group">
-      <h2>Quick Links</h2>
-      <a href="https://chat.openai.com/" target="_blank">ChatGPT</a>
-      <a href="https://webmail.aa.com/" target="_blank">Email</a>
-      <a href="https://teams.microsoft.com/" target="_blank">Teams</a>
-      <a href="https://airportal.aa.com/" target="_blank">Airportal</a>
-      <a href="https://spteam.aa.com/sites/D5B" target="_blank">DFW ABR Site</a>
-    </div>
-  </div>
+            document.getElementById("greeting").textContent = `${greeting}, Alex!`; 
+        }
 
-  <script>
-    const API_KEY = '3aaca9925662e52771fac9ab848724e7';
-    const DFW_LAT = 32.8998;
-    const DFW_LON = -97.0403;
+        async function fetchWeather() {
+            try {
+                const response = await fetch(
+                    `https://api.openweathermap.org/data/2.5/weather?lat=${DFW_LAT}&lon=${DFW_LON}&units=imperial&appid=${API_KEY}`
+                );
+                const data = await response.json();
 
-    function toggleTheme() {
-      const theme = document.body.getAttribute('data-theme');
-      document.body.setAttribute('data-theme', theme === 'dark' ? '' : 'dark');
-    }
+                const weather = data.weather[0].description;
+                const temp = Math.round(data.main.temp);
+                const windSpeed = Math.round(data.wind.speed);
 
-    function openFlightTracker() {
-      const flightNumber = document.getElementById('flight-number').value;
-      const service = document.getElementById('tracking-service').value;
-      const url = service === 'flightradar24'
-        ? `https://www.flightradar24.com/AAL${flightNumber}`
-        : `https://flightaware.com/live/flight/AAL${flightNumber}`;
-      window.open(url, '_blank');
-    }
+                document.getElementById('weather-info').innerHTML = `
+                    <strong>${weather.toUpperCase()}</strong><br>
+                    Temperature: ${temp}°F<br>
+                    Wind Speed: ${windSpeed} mph
+                `;
+            } catch (error) {
+                document.getElementById('weather-info').textContent =
+                    'Unable to fetch weather data at the moment.';
+            }
+        }
 
-    function setGreeting() {
-      const now = new Date();
-      const hours = now.getHours();
-      let greeting = "Welcome!";
-      if (hours < 12) greeting = "Good Morning!";
-      else if (hours < 18) greeting = "Good Afternoon!";
-      else greeting = "Good Evening!";
-      document.getElementById("greeting").textContent = `${greeting} You're at DFW Airport.`;
-    }
-
-    async function fetchWeather() {
-      try {
-        const response = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${DFW_LAT}&lon=${DFW_LON}&units=imperial&appid=${API_KEY}`
-        );
-        const data = await response.json();
-
-        const weather = data.weather[0].description;
-        const temp = Math.round(data.main.temp);
-        const windSpeed = Math.round(data.wind.speed);
-
-        document.getElementById('weather-info').innerHTML = `
-          <strong>${weather.toUpperCase()}</strong><br>
-          Temperature: ${temp}°F<br>
-          Wind Speed: ${windSpeed} mph
-        `;
-      } catch (error) {
-        document.getElementById('weather-info').textContent = 
-          'Unable to fetch weather data at the moment.';
-      }
-    }
-
-    setGreeting();
-    fetchWeather();
-  </script>
+        setGreeting();
+        fetchWeather();
+    </script>
 </body>
 </html>
