@@ -3,60 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Airport Maps</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <title>Ultimate Screen Test Page</title>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #e0f7fa;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #0073e6;
-            color: #fff;
-            padding: 2rem;
+            font-family: Arial, sans-serif;
             text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #f0f0f0;
         }
-        header h1 {
-            font-size: 2.5rem;
-        }
-        main {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        }
-        iframe {
-            width: 100%;
-            height: 500px;
-            border: none;
+        .section {
+            padding: 10px;
+            margin: 10px auto;
+            width: 90%;
+            max-width: 600px;
             border-radius: 8px;
+            background-color: white;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
-        a {
-            text-decoration: none;
-            color: #0073e6;
-            transition: color 0.3s;
+        .color-box, .test-box {
+            width: 100%;
+            height: 100px;
+            margin: 5px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
         }
-        a:hover {
-            text-decoration: underline;
-            color: #004d99;
+        .gradient-box {
+            width: 100%;
+            height: 100px;
+            cursor: pointer;
+        }
+        .text-box {
+            font-size: 20px;
+            margin-top: 10px;
+        }
+        #customColor {
+            width: 100%;
+            height: 100px;
+            border: none;
+        }
+        .fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+        }
+        .moving-bar {
+            width: 100%;
+            height: 50px;
+            background-color: black;
+            position: absolute;
+            top: 0;
+            animation: moveBar 2s infinite linear;
+        }
+        @keyframes moveBar {
+            0% { top: 0; }
+            100% { top: 100%; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Airport Maps</h1>
-        <p>Explore airport locations and layouts</p>
-    </header>
-    <main>
-        <iframe src="https://map.dfwairport.com/?_gl=1*1apmopr*_gcl_au*MTEzMjU5NDc0LjE3Mjk3OTgyNzc.*_ga*MTMxNDAyODE5Ni4xNzI5Nzk4Mjc3*_ga_JY80H9YV46*MTcyOTc5ODI3Ny4xLjAuMTcyOTc5ODI3Ny42MC4wLjA.*_ga_NH154WP1NJ*MTcyOTc5ODI3Ny4xLjAuMTcyOTc5ODI3Ny42MC4wLjA."></iframe>
-        <p>Use the map above to view airport locations. Zoom in to see more details about the surrounding areas and terminal layouts.</p>
-        <p><a href="index.html">Return to Home Page</a></p>
-    </main>
+    <h1>Ultimate Screen Test Page</h1>
+
+    <!-- Screen Information -->
+    <div class="section">
+        <h2>Screen Information</h2>
+        <p><strong>Screen Width:</strong> <span id="screenWidth"></span> px</p>
+        <p><strong>Screen Height:</strong> <span id="screenHeight"></span> px</p>
+        <p><strong>Pixel Ratio:</strong> <span id="pixelRatio"></span></p>
+        <p><strong>Color Depth:</strong> <span id="colorDepth"></span> bits</p>
+    </div>
+
+    <!-- RGB Color Test -->
+    <div class="section">
+        <h2>RGB Color Test</h2>
+        <div class="color-box" style="background:red;" onclick="openFullscreen('red')">Red</div>
+        <div class="color-box" style="background:green;" onclick="openFullscreen('green')">Green</div>
+        <div class="color-box" style="background:blue;" onclick="openFullscreen('blue')">Blue</div>
+        <div class="color-box" style="background:white; color:black;" onclick="openFullscreen('white')">White</div>
+        <div class="color-box" style="background:black;" onclick="openFullscreen('black')">Black</div>
+    </div>
+
+    <!-- Gradient & Banding Test -->
+    <div class="section">
+        <h2>Gradient & Banding Test</h2>
+        <div class="gradient-box" style="background: linear-gradient(to right, black, white);" onclick="openFullscreen('linear-gradient(to right, black, white)')"></div>
+        <div class="gradient-box" style="background: linear-gradient(to right, red, yellow, green, cyan, blue, magenta);" onclick="openFullscreen('linear-gradient(to right, red, yellow, green, cyan, blue, magenta)')"></div>
+    </div>
+
+    <!-- Flickering & Motion Blur Test -->
+    <div class="section">
+        <h2>Flickering & Motion Blur Test</h2>
+        <button onclick="startFlicker()">Start Flicker</button>
+        <button onclick="stopFlicker()">Stop Flicker</button>
+        <button onclick="startMotionBlur()">Start Motion Blur</button>
+        <button onclick="stopMotionBlur()">Stop Motion Blur</button>
+    </div>
+
+    <!-- Custom Color Picker -->
+    <div class="section">
+        <h2>Custom Color Test</h2>
+        <input type="color" id="customColor" onchange="openFullscreen(this.value)">
+    </div>
+
+    <script>
+        // Display Screen Information
+        document.getElementById('screenWidth').innerText = screen.width;
+        document.getElementById('screenHeight').innerText = screen.height;
+        document.getElementById('pixelRatio').innerText = window.devicePixelRatio;
+        document.getElementById('colorDepth').innerText = screen.colorDepth;
+
+        // Open Fullscreen Color Test
+        function openFullscreen(color) {
+            let div = document.createElement('div');
+            div.className = 'fullscreen';
+            div.style.background = color;
+            div.onclick = exitFullscreen;
+            document.body.appendChild(div);
+            requestFullscreen(div);
+        }
+
+        // Request Fullscreen
+        function requestFullscreen(element) {
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            }
+        }
+
+        // Exit Fullscreen
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+            document.querySelector('.fullscreen')?.remove();
+        }
+
+        // Flickering Test
+        let flickerInterval;
+        function startFlicker() {
+            stopFlicker();
+            let div = document.createElement('div');
+            div.className = 'fullscreen';
+            document.body.appendChild(div);
+            flickerInterval = setInterval(() => {
+                div.style.background = div.style.background === 'black' ? 'white' : 'black';
+            }, 200);
+            requestFullscreen(div);
+        }
+        function stopFlicker() {
+            clearInterval(flickerInterval);
+            exitFullscreen();
+        }
+
+        // Motion Blur Test
+        function startMotionBlur() {
+            stopMotionBlur();
+            let div = document.createElement('div');
+            div.className = 'fullscreen';
+            let movingBar = document.createElement('div');
+            movingBar.className = 'moving-bar';
+            div.appendChild(movingBar);
+            div.onclick = exitFullscreen;
+            document.body.appendChild(div);
+            requestFullscreen(div);
+        }
+        function stopMotionBlur() {
+            exitFullscreen();
+        }
+    </script>
 </body>
 </html>
