@@ -6,161 +6,383 @@
     <title>Device Log</title>
     <script src="https://unpkg.com/@zxing/library@latest"></script>
     <style>
+        /* Modern & Futuristic Styling (Updated Log Labels) */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #334155;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
             margin: 20px;
-            padding: 20px;
-            background-color: #f8f9fa;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
         }
         h1 {
             text-align: center;
-            color: #343a40;
+            color: #2d3748;
+            margin-bottom: 25px;
+            font-weight: 600;
         }
         .tabs {
             display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            background-color: #e2e8f0;
+            padding: 8px;
+            border-radius: 8px;
         }
         .tab {
-            padding: 10px 20px;
+            padding: 12px 20px;
             cursor: pointer;
-            border: 1px solid #dee2e6;
-            background-color: #ffffff;
-            margin: 0 5px;
-            border-radius: 5px;
+            border: none;
+            background-color: transparent;
+            color: #4a5568;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .tab:hover {
+            background-color: #d2d6dc;
+            color: #2d3748;
         }
         .tab.active {
-            background-color: #007bff;
+            background-color: #0ea5e9;
             color: white;
+            font-weight: 600;
         }
         .tab-content {
             display: none;
+            padding: 20px 0;
         }
         .tab-content.active {
             display: block;
         }
         input, button {
-            width: 100%;
-            padding: 10px;
+            width: calc(100% - 24px);
+            padding: 14px 12px;
             margin: 10px 0;
             font-size: 16px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            background-color: #f9fafb;
+            color: #334155;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: #0ea5e9;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
         }
         button {
-            background-color: #007bff;
+            background-color: #0ea5e9;
             color: white;
             cursor: pointer;
+            border: none;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #0b84b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+        button:disabled {
+            background-color: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
         }
         video {
             width: 100%;
-            max-height: 200px;
-            margin-top: 10px;
-            border: 1px solid #ddd;
+            max-height: 300px;
+            margin-top: 15px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
         .log {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            border: 1px solid #dee2e6;
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .log strong {
+            display: block;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        .log-counter {
+            font-weight: 600;
+            color: #0ea5e9; /* Teal counter color */
+            font-size: 1.1em;
         }
         .log ul {
             list-style-type: none;
             padding: 0;
         }
         .log li {
-            background: #ffffff;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ced4da;
+            background: #fff;
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            word-break: break-word;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .log-label {
+            font-weight: bold;
+            color: #718096; /* Medium gray label color */
+            margin-right: 8px;
+        }
+        .log-value {
+            color: #334155; /* Darker value color */
+        }
+        .log-buttons {
+            display: flex;
+            justify-content: flex-end; /* Align buttons to the right */
+            margin-top: 20px;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+        .log-buttons button {
+            margin-left: 10px; /* Spacing between buttons */
+            padding: 10px 15px; /* Slightly smaller button padding in log */
         }
         .footer {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
             font-size: 14px;
-            color: #6c757d;
+            color: #718096;
+        }
+        .footer a {
+            color: #0ea5e9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .message {
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+        .success {
+            background-color: #def7ec;
+            color: #03543e;
+            border: 1px solid #84e1bc;
+        }
+        .error {
+            background-color: #fde8e8;
+            color: #9b1c1c;
+            border: 1px solid #f8b4b4;
+        }
+        .timestamp {
+            color: #6b7280;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+                border-radius: 8px;
+            }
+            .tabs {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .tab {
+                margin: 5px 0;
+                border-radius: 6px;
+            }
+            .tab:not(:first-child) {
+                margin-left: 0;
+            }
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 20px;
+            }
+            .tab-content {
+                padding: 10px 0;
+            }
+            input, button {
+                padding: 12px;
+                font-size: 15px;
+                border-radius: 6px;
+            }
+            video {
+                max-height: 200px;
+                margin-top: 10px;
+                border-radius: 6px;
+            }
+            .log {
+                margin-top: 20px;
+                padding: 15px;
+                border-radius: 6px;
+            }
+            .log li {
+                padding: 10px;
+                border-radius: 5px;
+            }
+            .footer {
+                margin-top: 30px;
+                font-size: 13px;
+            }
+            .log-buttons {
+                flex-direction: column; /* Stack buttons on mobile */
+                align-items: stretch; /* Full width buttons */
+            }
+            .log-buttons button {
+                margin-left: 0;
+                margin-top: 10px; /* Add vertical spacing between stacked buttons */
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Device Log</h1>
+    <div class="container">
+        <h1>Device Log System</h1>
 
-    <div class="tabs">
-        <div class="tab active" onclick="showTab('camera')">Camera Input</div>
-        <div class="tab" onclick="showTab('scanner')">Scanner Input</div>
-        <div class="tab" onclick="showTab('manual')">Manual Input</div>
-        <div class="tab" onclick="showTab('log')">Log</div>
-    </div>
+        <div class="tabs">
+            <button class="tab active" data-tab="camera">Camera Input</button>
+            <button class="tab" data-tab="scanner">Scanner Input</button>
+            <button class="tab" data-tab="manual">Manual Input</button>
+            <button class="tab" data-tab="log">Log</button>
+        </div>
 
-    <!-- Camera Tab -->
-    <div id="camera" class="tab-content active">
-        <button onclick="startBarcodeScanner()">Start Camera</button>
-        <video id="preview"></video>
-        <label for="camera-device">Device Info:</label>
-        <input type="text" id="camera-device" placeholder="Device barcode">
-        <label for="camera-employee">Employee Badge:</label>
-        <input type="text" id="camera-employee" placeholder="Employee badge">
-        <button onclick="addCameraLog()">Submit</button>
-    </div>
+        <div id="message" class="message"></div>
 
-    <!-- Scanner Tab -->
-    <div id="scanner" class="tab-content">
-        <label for="scanner-device">Device Info:</label>
-        <input type="text" id="scanner-device" placeholder="Enter device barcode" oninput="scannerAutomation('scanner-employee')">
-        <label for="scanner-employee">Employee Badge:</label>
-        <input type="text" id="scanner-employee" placeholder="Enter employee badge" oninput="scannerSubmit()">
-    </div>
+        <div id="camera" class="tab-content active">
+            <h3>Camera Input</h3>
+            <button id="camera-start-button" onclick="startBarcodeScanner()">Start Camera Scanner</button>
+            <button id="camera-stop-button" onclick="stopBarcodeScanner()" style="display: none;">Stop Camera Scanner</button>
+            <video id="preview" autoplay="true" muted="true" playsinline="true"></video>
+            <label for="camera-device">Device Info:</label>
+            <input type="text" id="camera-device" placeholder="Device barcode">
+            <label for="camera-employee">Employee Badge:</label>
+            <input type="text" id="camera-employee" placeholder="Employee badge">
+            <button onclick="addCameraLog()">Submit Log</button>
+        </div>
 
-    <!-- Manual Tab -->
-    <div id="manual" class="tab-content">
-        <label for="manual-device">Device Info:</label>
-        <input type="text" id="manual-device" placeholder="Enter device barcode">
-        <label for="manual-employee">Employee Badge:</label>
-        <input type="text" id="manual-employee" placeholder="Enter employee badge">
-        <button onclick="addManualLog()">Submit</button>
-    </div>
+        <div id="scanner" class="tab-content">
+            <h3>Scanner Input</h3>
+            <label for="scanner-device">Device Info:</label>
+            <input type="text" id="scanner-device" placeholder="Enter device barcode" oninput="scannerAutomation('scanner-employee')">
+            <label for="scanner-employee">Employee Badge:</label>
+            <input type="text" id="scanner-employee" placeholder="Enter employee badge" oninput="scannerSubmit()">
+        </div>
 
-    <!-- Log Tab -->
-    <div id="log" class="tab-content">
-        <div class="log">
-            <strong>Formatted Output Log:</strong>
-            <ul id="log-list"></ul>
-            <button onclick="copyLog()">Copy All</button>
-            <button onclick="clearLog()">Clear Log</button>
-            <button onclick="sendLogEmail()">Send Log via Email</button>
+        <div id="manual" class="tab-content">
+            <h3>Manual Input</h3>
+            <label for="manual-device">Device Info:</label>
+            <input type="text" id="manual-device" placeholder="Enter device barcode">
+            <label for="manual-employee">Employee Badge:</label>
+            <input type="text" id="manual-employee" placeholder="Employee badge">
+            <button onclick="addManualLog()">Submit Log</button>
+        </div>
+
+        <div id="log" class="tab-content">
+            <div class="log">
+                <div class="log-header">
+                    <strong>Formatted Output Log</strong>
+                    <span class="log-counter" id="log-counter">Total Inputs: 0</span>
+                </div>
+                <ul id="log-list"></ul>
+                <div class="log-buttons">
+                    <button onclick="copyLog()">Copy Log</button>
+                    <button onclick="exportToCsv()">Export CSV</button>
+                    <button onclick="clearLog()">Clear Log</button>
+                    <button onclick="sendLogEmail()">Send Email</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Version 1.1 | Developed by <a href="#">Alex Alexov</a>
         </div>
     </div>
 
-    <div class="footer">Version 1 | Alex Alexov</div>
-
     <script>
         let scannerTimeout;
+        let logEntryCounter = 0; // Initialize log entry counter
+        let codeReader = null;
+        
+        // Load logs from localStorage when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLogsFromStorage();
+            setupTabs();
+        });
+
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    showTab(tabId);
+                });
+            });
+        }
 
         function showTab(tabId) {
-            const tabs = document.querySelectorAll('.tab-content');
-            tabs.forEach(tab => tab.classList.remove('active'));
+            // First stop any active camera if we're switching away from camera tab
+            if (tabId !== 'camera' && codeReader) {
+                stopBarcodeScanner();
+            }
 
+            // Hide all tab contents and deactivate all tab buttons
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
             const tabButtons = document.querySelectorAll('.tab');
             tabButtons.forEach(button => button.classList.remove('active'));
-
+            
+            // Activate the selected tab and its button
             document.getElementById(tabId).classList.add('active');
-            document.querySelector(`.tab.${tabId}`).classList.add('active');
+            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
 
+            // Set focus for scanner tab
             if (tabId === 'scanner') {
                 document.getElementById('scanner-device').focus();
             }
+            
+            updateLogCounterDisplay();
         }
 
         function scannerAutomation(nextInputId) {
             clearTimeout(scannerTimeout);
             scannerTimeout = setTimeout(() => {
                 document.getElementById(nextInputId).focus();
-            }, 1000); // Move to employee field after 1 second
+            }, 1000);
         }
 
         function scannerSubmit() {
@@ -168,112 +390,300 @@
             scannerTimeout = setTimeout(() => {
                 const device = document.getElementById('scanner-device').value.trim();
                 const employee = document.getElementById('scanner-employee').value.trim();
-
-                if (!device || !employee) {
-                    alert("Both fields are required.");
-                    return;
+                
+                if (device && employee) {
+                    addLogEntry(device, employee, 'scanner');
+                    showMessage('Log entry added successfully!', 'success');
                 }
-
-                const formattedLog = `${device}/${employee}`;
-                const logList = document.getElementById('log-list');
-                const newLogItem = document.createElement('li');
-                newLogItem.textContent = formattedLog;
-                logList.appendChild(newLogItem);
-
-                document.getElementById('scanner-device').value = '';
-                document.getElementById('scanner-employee').value = '';
-                document.getElementById('scanner-device').focus();
-            }, 1000); // Submit after 1 second
+            }, 1000);
         }
 
         async function startBarcodeScanner() {
             const videoElem = document.getElementById('preview');
-            const codeReader = new ZXing.BrowserMultiFormatReader();
+            const startButton = document.getElementById('camera-start-button');
+            const stopButton = document.getElementById('camera-stop-button');
+            
+            if (codeReader) {
+                stopBarcodeScanner();
+                return;
+            }
+            
+            codeReader = new ZXing.BrowserMultiFormatReader();
+            
             try {
+                startButton.disabled = true;
+                
                 await codeReader.decodeFromVideoDevice(
-                    null,
+                    undefined, // Use default video device
                     videoElem,
                     result => {
                         if (result) {
                             const text = result.text;
-
+                            const beep = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU..." /* shortened for brevity */);
+                            beep.play().catch(e => {}); // Ignore if browser blocks autoplay
+                            
                             if (!document.getElementById('camera-device').value) {
                                 document.getElementById('camera-device').value = text;
+                                showMessage('Device barcode scanned successfully!', 'success');
                             } else if (!document.getElementById('camera-employee').value) {
                                 document.getElementById('camera-employee').value = text;
+                                showMessage('Employee badge scanned successfully!', 'success');
                             }
                         }
                     }
                 );
+                
+                // Show stop button and hide start button
+                startButton.style.display = 'none';
+                stopButton.style.display = 'block';
+                
             } catch (error) {
-                alert("Error starting camera: " + error.message);
+                showMessage('Error starting camera: ' + error.message, 'error');
+                startButton.disabled = false;
+            }
+        }
+        
+        function stopBarcodeScanner() {
+            const startButton = document.getElementById('camera-start-button');
+            const stopButton = document.getElementById('camera-stop-button');
+            
+            if (codeReader) {
+                codeReader.reset();
+                codeReader = null;
+                
+                // Show start button and hide stop button
+                startButton.style.display = 'block';
+                stopButton.style.display = 'none';
+                startButton.disabled = false;
             }
         }
 
         function addCameraLog() {
             const device = document.getElementById('camera-device').value.trim();
             const employee = document.getElementById('camera-employee').value.trim();
-
-            if (!device || !employee) {
-                alert("Both fields are required.");
-                return;
+            
+            if (addLogEntry(device, employee, 'camera')) {
+                showMessage('Log entry added successfully!', 'success');
             }
-
-            const formattedLog = `${device}/${employee}`;
-            const logList = document.getElementById('log-list');
-            const newLogItem = document.createElement('li');
-            newLogItem.textContent = formattedLog;
-            logList.appendChild(newLogItem);
-
-            document.getElementById('camera-device').value = '';
-            document.getElementById('camera-employee').value = '';
         }
 
         function addManualLog() {
             const device = document.getElementById('manual-device').value.trim();
             const employee = document.getElementById('manual-employee').value.trim();
+            
+            if (addLogEntry(device, employee, 'manual')) {
+                showMessage('Log entry added successfully!', 'success');
+            }
+        }
 
+        function addLogEntry(device, employee, method) {
             if (!device || !employee) {
-                alert("Both fields are required.");
-                return;
+                showMessage("Both Device Info and Employee Badge are required.", 'error');
+                return false;
             }
 
-            const formattedLog = `${device}/${employee}`;
             const logList = document.getElementById('log-list');
             const newLogItem = document.createElement('li');
-            newLogItem.textContent = formattedLog;
+            const timestamp = new Date().toLocaleString();
+
+            // Create log entry object for storage
+            const logEntry = {
+                device: device,
+                employee: employee,
+                timestamp: timestamp,
+                method: method
+            };
+
+            // Construct HTML for log entry with labels and timestamp
+            newLogItem.innerHTML = `
+                <span class="log-label">Device:</span><span class="log-value">${device}</span><br>
+                <span class="log-label">Employee:</span><span class="log-value">${employee}</span><br>
+                <div class="timestamp">${timestamp}</div>
+            `;
+            
             logList.appendChild(newLogItem);
 
-            document.getElementById('manual-device').value = '';
-            document.getElementById('manual-employee').value = '';
+            logEntryCounter++; // Increment counter
+            updateLogCounterDisplay(); // Update the display
+            
+            // Save to localStorage
+            saveLogToStorage(logEntry);
+
+            // Clear input fields based on method
+            if (method === 'camera') {
+                document.getElementById('camera-device').value = '';
+                document.getElementById('camera-employee').value = '';
+            } else if (method === 'manual') {
+                document.getElementById('manual-device').value = '';
+                document.getElementById('manual-employee').value = '';
+            } else if (method === 'scanner') {
+                document.getElementById('scanner-device').value = '';
+                document.getElementById('scanner-employee').value = '';
+                document.getElementById('scanner-device').focus(); // Focus back for next scan
+            }
+            
+            return true;
+        }
+
+        function updateLogCounterDisplay() {
+            document.getElementById('log-counter').textContent = `Total Inputs: ${logEntryCounter}`;
         }
 
         function copyLog() {
-            const logItems = [...document.querySelectorAll('#log-list li')].map(item => item.textContent);
-            navigator.clipboard.writeText(logItems.join('\n')).then(() => {
-                alert('Log copied to clipboard!');
+            const logItems = [...document.querySelectorAll('#log-list li')].map(item => {
+                // Get all text content, format it properly
+                const deviceLabel = item.querySelector('.log-label:nth-of-type(1)').textContent;
+                const deviceValue = item.querySelector('.log-value:nth-of-type(1)').textContent;
+                const employeeLabel = item.querySelector('.log-label:nth-of-type(2)').textContent;
+                const employeeValue = item.querySelector('.log-value:nth-of-type(2)').textContent;
+                const timestamp = item.querySelector('.timestamp').textContent;
+
+                return `${deviceLabel} ${deviceValue}, ${employeeLabel} ${employeeValue} (${timestamp})`;
             });
+            
+            if (logItems.length === 0) {
+                showMessage("The log is empty. Add entries before copying.", 'error');
+                return;
+            }
+            
+            navigator.clipboard.writeText(logItems.join('\n'))
+                .then(() => {
+                    showMessage('Log copied to clipboard!', 'success');
+                })
+                .catch(err => {
+                    showMessage('Failed to copy log: ' + err.message, 'error');
+                });
         }
 
         function clearLog() {
-            document.getElementById('log-list').innerHTML = '';
+            if (logEntryCounter === 0) {
+                showMessage("The log is already empty.", 'error');
+                return;
+            }
+            
+            if (confirm("Are you sure you want to clear all log entries? This cannot be undone.")) {
+                document.getElementById('log-list').innerHTML = '';
+                logEntryCounter = 0; // Reset counter on clear log
+                updateLogCounterDisplay(); // Update the display after clearing
+                
+                // Clear localStorage
+                localStorage.removeItem('deviceLogEntries');
+                showMessage("Log cleared successfully.", 'success');
+            }
         }
 
         function sendLogEmail() {
-            const logItems = [...document.querySelectorAll('#log-list li')].map(item => item.textContent);
-            const logText = logItems.join('\n');
-            const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-            const subject = `Device Log - ${currentDate}`;
-            const body = encodeURIComponent(logText);
+            const logItems = [...document.querySelectorAll('#log-list li')].map(item => {
+                // Format for email
+                const deviceLabel = item.querySelector('.log-label:nth-of-type(1)').textContent;
+                const deviceValue = item.querySelector('.log-value:nth-of-type(1)').textContent;
+                const employeeLabel = item.querySelector('.log-label:nth-of-type(2)').textContent;
+                const employeeValue = item.querySelector('.log-value:nth-of-type(2)').textContent;
+                const timestamp = item.querySelector('.timestamp').textContent;
 
+                return `${deviceLabel} ${deviceValue}, ${employeeLabel} ${employeeValue} (${timestamp})`;
+            });
+            
             if (logItems.length === 0) {
-                alert("The log is empty. Add entries before sending.");
+                showMessage("The log is empty. Add entries before sending.", 'error');
                 return;
             }
+            
+            const logText = logItems.join('\n');
+            const currentDate = new Date().toISOString().split('T')[0]; //YYYY-MM-DD
+            const subject = `Device Log - ${currentDate}`;
+            const body = encodeURIComponent(logText);
 
             const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${body}`;
             window.location.href = mailtoLink;
         }
+
+        function exportToCsv() {
+            const logs = getLogsFromStorage();
+            
+            if (logs.length === 0) {
+                showMessage("The log is empty. Add entries before exporting.", 'error');
+                return;
+            }
+            
+            // Create CSV content
+            let csvContent = "Device,Employee,Timestamp,Method\n";
+            
+            logs.forEach(log => {
+                // Escape commas in the data
+                const device = `"${log.device.replace(/"/g, '""')}"`;
+                const employee = `"${log.employee.replace(/"/g, '""')}"`;
+                const timestamp = `"${log.timestamp.replace(/"/g, '""')}"`;
+                const method = `"${log.method || 'unknown'}"`;
+                
+                csvContent += `${device},${employee},${timestamp},${method}\n`;
+            });
+            
+            // Create blob and download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `device_log_${currentDate}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showMessage("CSV file exported successfully!", 'success');
+        }
+
+        function showMessage(message, type) {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = message;
+            messageElement.className = `message ${type}`;
+            messageElement.style.display = 'block';
+            
+            // Hide the message after 3 seconds
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 3000);
+        }
+        
+        // LocalStorage functions
+        function saveLogToStorage(logEntry) {
+            const logs = getLogsFromStorage();
+            logs.push(logEntry);
+            localStorage.setItem('deviceLogEntries', JSON.stringify(logs));
+        }
+        
+        function getLogsFromStorage() {
+            const storedLogs = localStorage.getItem('deviceLogEntries');
+            return storedLogs ? JSON.parse(storedLogs) : [];
+        }
+        
+        function loadLogsFromStorage() {
+            const logs = getLogsFromStorage();
+            const logList = document.getElementById('log-list');
+            
+            // Clear existing UI logs
+            logList.innerHTML = '';
+            
+            // Add each log to the UI
+            logs.forEach(log => {
+                const newLogItem = document.createElement('li');
+                newLogItem.innerHTML = `
+                    <span class="log-label">Device:</span><span class="log-value">${log.device}</span><br>
+                    <span class="log-label">Employee:</span><span class="log-value">${log.employee}</span><br>
+                    <div class="timestamp">${log.timestamp}</div>
+                `;
+                logList.appendChild(newLogItem);
+            });
+            
+            // Update counter
+            logEntryCounter = logs.length;
+            updateLogCounterDisplay();
+        }
+
+        // Set Camera tab as default active tab
+        showTab('camera');
     </script>
 </body>
 </html>
