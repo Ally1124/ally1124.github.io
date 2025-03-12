@@ -1,242 +1,651 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Device Information</title>
-<style>
-body {
-  font-family: sans-serif;
-}
-table {
-  border-collapse: collapse;
-  width: 50%;
-  margin: 20px auto;
-}
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-th {
-  background-color: #f2f2f2;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AA Alert Generator</title>
+    <style>
+        /* Toggle switch styling */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+        
+        input:checked + .slider {
+            background-color: #003087;
+        }
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px #003087;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .slider.round {
+            border-radius: 24px;
+        }
+        
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        
+        /* Modern design system with AA branding */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+        .header {
+            width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .header-placeholder {
+            background: linear-gradient(to right, #003087, #d2232a);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        h1 {
+            color: #003087;
+            font-size: 28px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 3px solid #d2232a;
+            padding-bottom: 10px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        select {
+            background-color: white;
+            cursor: pointer;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #003087;
+            box-shadow: 0 0 5px rgba(0, 48, 135, 0.3);
+        }
+        button {
+            background: #003087;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: background 0.3s;
+            text-transform: uppercase;
+            margin-top: 10px;
+            padding: 15px;
+        }
+        button:hover {
+            background: #d2232a;
+        }
+        .preview-section {
+            margin-top: 30px;
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+        }
+        .width-control {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .width-control label {
+            margin-right: 10px;
+            margin-bottom: 0;
+        }
+        .width-control input {
+            flex: 1;
+        }
+        .width-control .width-value {
+            min-width: 40px;
+            text-align: right;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        .alert-preview {
+            margin-top: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .alert-box {
+            padding: 20px;
+            color: black;
+            text-align: left;
+            font-size: 18px;
+            background-color: white;
+        }
+        .alert-header {
+            color: white;
+            padding: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+        }
+        .blue-header { 
+            background: linear-gradient(to bottom, #0080ff, #003087); 
+        }
+        .red-header { 
+            background: linear-gradient(to bottom, #ff3b3b, #d2232a); 
+        }
+        .alert-details {
+            font-size: 20px;
+            line-height: 1.6;
+        }
+        .alert-details span {
+            font-weight: bold;
+            color: #003087;
+        }
+        .hidden {
+            display: none;
+        }
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .copy-btn {
+            background: #d2232a;
+        }
+        .reset-btn {
+            background: #555;
+        }
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<h1>Device Information</h1>
+    <div class="container">
+        <!-- If you have a real header image, uncomment this line and comment out the placeholder -->
+        <!-- <img src="header_image.jpg" alt="Operations Alert" class="header"> -->
+        
+        <div class="header-placeholder">AA OPERATIONS ALERT</div>
+        
+        <h1>Alert Generator</h1>
 
-<table>
-  <tr>
-    <th>Data Point</th>
-    <th>Value</th>
-  </tr>
-  <tr>
-    <td>Operating System</td>
-    <td><script>document.write(navigator.platform);</script></td>
-  </tr>
-  <tr>
-    <td>IP Address</td>
-    <td><div id="ip_address">Loading...</div></td>
-  </tr>
-  <tr>
-    <td>Javascript Enabled</td>
-    <td><script>document.write(navigator.javaEnabled() ? "Yes" : "No");</script></td>
-  </tr>
-  <tr>
-    <td>Cookies Enabled</td>
-    <td><script>document.write(navigator.cookieEnabled ? "Yes" : "No");</script></td>
-  </tr>
-  <tr>
-    <td>Flash Version</td>
-    <td><div id="flash_version"></div></td>
-  </tr>
-  <tr>
-    <td>Java Version</td>
-    <td><div id="java_version"></div></td>
-  </tr>
-  <tr>
-    <td>WebSockets Supported</td>
-    <td><script>document.write(window.WebSocket ? "Yes" : "No");</script></td>
-  </tr>
-  <tr>
-    <td>WebGL Supported</td>
-    <td><script>document.write(detectWebGL() ? "Yes" : "No");</script></td>
-  </tr>
-  <tr>
-    <td>Browser</td>
-    <td><script>document.write(navigator.appName);</script></td>
-  </tr>
-  <tr>
-    <td>Browser Version</td>
-    <td><script>document.write(navigator.appVersion);</script></td>
-  </tr>
-  <tr>
-    <td>Language</td>
-    <td><script>document.write(navigator.language);</script></td>
-  </tr>
-  <tr>
-    <td>Browser Size</td>
-    <td><script>document.write(window.innerWidth + " x " + window.innerHeight);</script></td>
-  </tr>
-  <tr>
-    <td>Screen Size</td>
-    <td><script>document.write(screen.width + " x " + screen.height);</script></td>
-  </tr>
-  <tr>
-    <td>Color Depth</td>
-    <td><script>document.write(screen.colorDepth + " bits");</script></td>
-  </tr>
-  <tr>
-    <td>Encoding</td>
-    <td><script>document.write(document.characterSet);</script></td>
-  </tr>
-  <tr>
-    <td>Connection Type</td>
-    <td><script>
-      if (navigator.connection) {
-        document.write(navigator.connection.effectiveType);
-      } else {
-        document.write("Unknown");
-      }
-    </script></td>
-  </tr>
-  <tr>
-    <td>Keep Alive Enabled</td>
-    <td><script>document.write(navigator.sendBeacon ? "Yes" : "No");</script></td>
-  </tr>
-  <tr>
-    <td>Battery Level</td>
-    <td><div id="battery"></div></td> 
-  </tr>
-  <tr>
-    <td>CPU Cores</td>
-    <td><script>document.write(navigator.hardwareConcurrency);</script></td>
-  </tr>
-  <tr>
-    <td>Geolocation</td>
-    <td><button onclick="getGeolocation()">Get Geolocation</button>
-        <div id="geolocation"></div>
-    </td>
-  </tr>
-  <tr>
-    <td>Installed Plugins</td>
-    <td><script>
-      var plugins = navigator.plugins;
-      if (plugins.length > 0) {
-        for (var i = 0; i < plugins.length; i++) {
-          document.write(plugins[i].name + "<br>");
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label for="alertType">Alert Type</label>
+                <select id="alertType" onchange="handleAlertSelection()">
+                    <option value="">-- Select Alert Type --</option>
+                    <option value="ABR HOLD">ABR Hold</option>
+                    <option value="HCC HOLD">HCC Hold</option>
+                    <option value="FLIGHT RON">Flight RON</option>
+                    <option value="FLIGHT CANCELLATION">Flight Cancellation</option>
+                    <option value="GATE SWAP">Gate Swap</option>
+                    <option value="AIRCRAFT CHANGE">Aircraft Change</option>
+                    <option value="INTERNATIONAL COMINGLE APPROVED">International Comingle Approved</option>
+                    <option value="CUSTOM">Custom Alert</option>
+                </select>
+            </div>
+
+            <div class="form-group full-width hidden" id="customAlertGroup">
+                <label for="customAlert">Custom Alert Type</label>
+                <input type="text" id="customAlert" placeholder="Enter custom alert title">
+            </div>
+            
+            <div class="form-group">
+                <label for="flightNumber">Flight Number</label>
+                <input type="text" id="flightNumber" placeholder="Enter flight number (e.g. 1234)">
+            </div>
+
+            <div class="form-group">
+                <label for="destination">Destination</label>
+                <input type="text" id="destination" placeholder="Enter destination (e.g. LGA)">
+            </div>
+
+            <div class="form-group">
+                <label for="departureGate">Departure Gate</label>
+                <input type="text" id="departureGate" placeholder="Enter gate (e.g. D04)">
+            </div>
+
+            <div class="form-group">
+                <label for="holdTime">Hold Time (minutes)</label>
+                <input type="number" id="holdTime" placeholder="Enter hold time in minutes">
+            </div>
+
+            <!-- Date and Time Fields with Toggle -->
+            <div class="form-group">
+                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                    <label for="includeDateToggle" style="margin-bottom: 0; margin-right: 10px;">Include Date</label>
+                    <label class="switch">
+                        <input type="checkbox" id="includeDateToggle" checked onchange="toggleDateVisibility()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <input type="date" id="alertDate" class="date-field">
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                    <label for="includeTimeToggle" style="margin-bottom: 0; margin-right: 10px;">Include Time</label>
+                    <label class="switch">
+                        <input type="checkbox" id="includeTimeToggle" checked onchange="toggleTimeVisibility()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <input type="time" id="alertTime" class="time-field">
+            </div>
+
+            <!-- Flight RON specific fields -->
+            <div id="flightRonFields" class="hidden">
+                <div class="form-group">
+                    <label for="etd">ETD (Estimated Time of Departure)</label>
+                    <input type="time" id="etd">
+                </div>
+
+                <div class="form-group">
+                    <label for="anticipatedGate">Anticipated Gate</label>
+                    <input type="text" id="anticipatedGate" placeholder="Enter anticipated gate">
+                </div>
+            </div>
+
+            <!-- Gate Swap specific fields -->
+            <div id="gateSwapFields" class="hidden">
+                <div class="form-group">
+                    <label for="originalGate">Original Gate</label>
+                    <input type="text" id="originalGate" placeholder="Enter original gate">
+                </div>
+
+                <div class="form-group">
+                    <label for="newGate">New Gate</label>
+                    <input type="text" id="newGate" placeholder="Enter new gate">
+                </div>
+            </div>
+
+            <!-- Aircraft Change specific fields -->
+            <div id="aircraftChangeFields" class="hidden">
+                <div class="form-group">
+                    <label for="originalAircraft">Original Aircraft</label>
+                    <input type="text" id="originalAircraft" placeholder="Enter original aircraft (e.g. A321)">
+                </div>
+
+                <div class="form-group">
+                    <label for="newAircraft">New Aircraft</label>
+                    <input type="text" id="newAircraft" placeholder="Enter new aircraft (e.g. B738)">
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="customNotes">Additional Notes</label>
+                <input type="text" id="customNotes" placeholder="Enter any additional notes or details">
+            </div>
+
+            <div class="form-group full-width">
+                <button onclick="generateNotification()">Generate Alert</button>
+            </div>
+        </div>
+
+        <div class="preview-section hidden" id="previewSection">
+            <h2>Alert Preview</h2>
+            
+            <div class="width-control">
+                <label for="alertWidth">Output Width:</label>
+                <input type="range" id="alertWidth" min="200" max="800" step="10" value="600" oninput="updateAlertWidth()">
+                <span id="widthValue" class="width-value">600px</span>
+            </div>
+            
+            <div class="alert-preview" id="alertPreview" style="width: 600px; margin: 0 auto;">
+                <div id="alertHeader" class="alert-header blue-header">ALERT TYPE</div>
+                <div id="output" class="alert-box">
+                    <div class="alert-details">
+                        Preview will appear here
+                    </div>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+                <button class="reset-btn" onclick="resetForm()">Reset Form</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateAlertWidth() {
+            const widthSlider = document.getElementById('alertWidth');
+            const widthValue = document.getElementById('widthValue');
+            const alertPreview = document.getElementById('alertPreview');
+            
+            const width = widthSlider.value;
+            widthValue.textContent = `${width}px`;
+            alertPreview.style.width = `${width}px`;
         }
-      } else {
-        document.write("No plugins detected");
-      }
-    </script></td>
-  </tr>
-</table>
+        
+        // Initialize date field with current date
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const dateField = document.getElementById('alertDate');
+            dateField.valueAsDate = today;
+            
+            // Format current time (HH:MM)
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('alertTime').value = `${hours}:${minutes}`;
+        });
 
-<p>Note: Some information may require user permission or may not be available in all browsers.</p>
+        function handleAlertSelection() {
+            const alertType = document.getElementById('alertType').value;
+            
+            // Hide all special fields first
+            document.getElementById('flightRonFields').classList.add('hidden');
+            document.getElementById('gateSwapFields').classList.add('hidden');
+            document.getElementById('aircraftChangeFields').classList.add('hidden');
+            document.getElementById('customAlertGroup').classList.add('hidden');
+            
+            // Show relevant fields based on selection
+            if (alertType === "FLIGHT RON") {
+                document.getElementById('flightRonFields').classList.remove('hidden');
+            } else if (alertType === "GATE SWAP") {
+                document.getElementById('gateSwapFields').classList.remove('hidden');
+            } else if (alertType === "AIRCRAFT CHANGE") {
+                document.getElementById('aircraftChangeFields').classList.remove('hidden');
+            } else if (alertType === "CUSTOM") {
+                document.getElementById('customAlertGroup').classList.remove('hidden');
+            }
+        }
 
-<script>
-// IP Address (requires external service)
-fetch('https://api.ipify.org?format=json')
-  .then(response => response.json())
-  .then(data => document.getElementById("ip_address").innerHTML = data.ip)
-  .catch(error => document.getElementById("ip_address").innerHTML = "Error fetching IP");
+        function formatTime(timeString) {
+            if (!timeString) return '';
+            
+            try {
+                const [hours, minutes] = timeString.split(':');
+                const hour = parseInt(hours);
+                const ampm = hour >= 12 ? 'PM' : 'AM';
+                const hour12 = hour % 12 || 12;
+                return `${hour12}:${minutes} ${ampm}`;
+            } catch (e) {
+                return timeString;
+            }
+        }
 
-// Flash Version
-var flashVersion = getFlashVersion();
-document.getElementById("flash_version").innerHTML = flashVersion ? flashVersion : "Not detected";
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+            } catch (e) {
+                return dateString;
+            }
+        }
 
-function getFlashVersion() {
-  try {
-    try {
-      // Avoid fp64 "toString" bug in Chrome v45
-      var flash = new ActiveXObject('ShockwaveFlash.ShockwaveFlash.6');
-      flash.AllowScriptAccess = 'always';
-      return flash.GetVariable('$version').replace(/\D+/g, ',').match(/^,?(.+),?$/)[1];
-    } catch (e) {
-      try {
-        var flash = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
-        return flash.GetVariable('$version').replace(/\D+/g, ',').match(/^,?(.+),?$/)[1];
-      } catch (e) {
-        throw "Error detecting Flash version";
-      }
-    }
-  } catch (e) {
-    return null;
-  }
-}
-
-// Java Version
-var javaVersion = getJavaVersion();
-document.getElementById("java_version").innerHTML = javaVersion ? javaVersion : "Not detected";
-
-function getJavaVersion() {
-  try {
-    var java = navigator.javaEnabled() ? getJavaPlugin().version : null;
-    return java;
-  } catch (e) {
-    return null;
-  }
-}
-
-function getJavaPlugin() {
-  for (var i = 0; i < navigator.plugins.length; i++) {
-    if (navigator.plugins[i].name.indexOf("Java") !== -1) {
-      return navigator.plugins[i];
-    }
-  }
-  return null;
-}
-
-// WebGL Supported
-function detectWebGL() {
-  // Create canvas element. The canvas is not added to the
-  // document itself, so these context creation calls don't
-  // trigger an automatic insertion of the canvas into the document.
-  var canvas = document.createElement("canvas");
-  var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-  return gl != null;
-}
-
-// Battery level (needs to be outside the table to work correctly)
-if (navigator.getBattery) {
-  navigator.getBattery().then(function(battery) {
-    document.getElementById("battery").innerHTML = Math.round(battery.level * 100) + "%";
-  });
-} else {
-  document.getElementById("battery").innerHTML = "Not supported";
-}
-
-function getGeolocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition, showError);
-  } else { 
-    document.getElementById("geolocation").innerHTML = "Geolocation is not supported by this browser.";
-  }
-}
-
-function showPosition(position) {
-  document.getElementById("geolocation").innerHTML = "Latitude: " + position.coords.latitude + 
-  "<br>Longitude: " + position.coords.longitude;
-}
-
-function showError(error) {
-  switch(error.code) {
-    case error.PERMISSION_DENIED:
-      document.getElementById("geolocation").innerHTML = "User denied the request for Geolocation."
-      break;
-    case error.POSITION_UNAVAILABLE:
-      document.getElementById("geolocation").innerHTML = "Location information is unavailable."
-      break;
-    case error.TIMEOUT:
-      document.getElementById("geolocation").innerHTML = "The request to get user location timed out."
-      break;
-    case error.UNKNOWN_ERROR:
-      document.getElementById("geolocation").innerHTML = "An unknown error occurred."
-      break;
-  }
-}
-</script>
+        function toggleDateVisibility() {
+            const includeDate = document.getElementById('includeDateToggle').checked;
+            const dateField = document.getElementById('alertDate');
+            
+            dateField.disabled = !includeDate;
+            dateField.style.opacity = includeDate ? 1 : 0.5;
+        }
+        
+        function toggleTimeVisibility() {
+            const includeTime = document.getElementById('includeTimeToggle').checked;
+            const timeField = document.getElementById('alertTime');
+            
+            timeField.disabled = !includeTime;
+            timeField.style.opacity = includeTime ? 1 : 0.5;
+        }
+        
+        function generateNotification() {
+            // Get all form values
+            const formData = {
+                alertType: document.getElementById('alertType').value,
+                customAlert: document.getElementById('customAlert').value.trim(),
+                flightNumber: document.getElementById('flightNumber').value.trim(),
+                departureGate: document.getElementById('departureGate').value.trim(),
+                destination: document.getElementById('destination').value.trim(),
+                holdTime: document.getElementById('holdTime').value.trim(),
+                includeDate: document.getElementById('includeDateToggle').checked,
+                includeTime: document.getElementById('includeTimeToggle').checked,
+                alertDate: document.getElementById('alertDate').value,
+                alertTime: document.getElementById('alertTime').value,
+                etd: document.getElementById('etd').value,
+                anticipatedGate: document.getElementById('anticipatedGate').value.trim(),
+                originalGate: document.getElementById('originalGate').value.trim(),
+                newGate: document.getElementById('newGate').value.trim(),
+                originalAircraft: document.getElementById('originalAircraft').value.trim(),
+                newAircraft: document.getElementById('newAircraft').value.trim(),
+                customNotes: document.getElementById('customNotes').value.trim()
+            };
+            
+            // Validate required fields based on alert type
+            if (!formData.alertType) {
+                alert('Please select an alert type');
+                return;
+            }
+            
+            if (formData.alertType === "CUSTOM" && !formData.customAlert) {
+                alert('Please enter a custom alert type');
+                return;
+            }
+            
+            // Set header color based on alert type
+            const isRedAlert = formData.alertType === "FLIGHT RON" || formData.alertType === "FLIGHT CANCELLATION";
+            const headerClass = isRedAlert ? "red-header" : "blue-header";
+            
+            // Update alert header
+            const headerText = formData.alertType === "CUSTOM" ? formData.customAlert : formData.alertType;
+            document.getElementById('alertHeader').textContent = headerText.toUpperCase();
+            document.getElementById('alertHeader').className = `alert-header ${headerClass}`;
+            
+            // Build alert content based on alert type
+            let alertContent = '';
+            
+            // Add date and time if toggled on
+            let dateTimeText = "<span>ISSUED:</span> ";
+            let hasDateTime = false;
+            
+            if (formData.includeDate && formData.alertDate) {
+                dateTimeText += formatDate(formData.alertDate);
+                hasDateTime = true;
+            }
+            
+            if (formData.includeTime && formData.alertTime) {
+                if (hasDateTime) dateTimeText += " ";
+                dateTimeText += formatTime(formData.alertTime);
+                hasDateTime = true;
+            }
+            
+            if (hasDateTime) {
+                alertContent += `<p>${dateTimeText}</p>`;
+            }
+            
+            // Add flight info
+            if (formData.flightNumber) {
+                alertContent += `<p><span>FLIGHT:</span> AA${formData.flightNumber}</p>`;
+            }
+            
+            if (formData.destination) {
+                alertContent += `<p><span>DESTINATION:</span> ${formData.destination}</p>`;
+            }
+            
+            // Add specific details based on alert type
+            switch (formData.alertType) {
+                case "ABR HOLD":
+                case "HCC HOLD":
+                    if (formData.departureGate) alertContent += `<p><span>GATE:</span> ${formData.departureGate}</p>`;
+                    if (formData.holdTime) alertContent += `<p><span>HOLD TIME:</span> ${formData.holdTime} minutes</p>`;
+                    break;
+                    
+                case "FLIGHT RON":
+                    if (formData.departureGate) alertContent += `<p><span>CURRENT GATE:</span> ${formData.departureGate}</p>`;
+                    if (formData.etd) alertContent += `<p><span>ETD:</span> ${formatTime(formData.etd)}</p>`;
+                    if (formData.anticipatedGate) alertContent += `<p><span>ANTICIPATED GATE:</span> ${formData.anticipatedGate}</p>`;
+                    break;
+                    
+                case "FLIGHT CANCELLATION":
+                    if (formData.departureGate) alertContent += `<p><span>GATE:</span> ${formData.departureGate}</p>`;
+                    break;
+                    
+                case "GATE SWAP":
+                    if (formData.originalGate) alertContent += `<p><span>ORIGINAL GATE:</span> ${formData.originalGate}</p>`;
+                    if (formData.newGate) alertContent += `<p><span>NEW GATE:</span> ${formData.newGate}</p>`;
+                    break;
+                    
+                case "AIRCRAFT CHANGE":
+                    if (formData.departureGate) alertContent += `<p><span>GATE:</span> ${formData.departureGate}</p>`;
+                    if (formData.originalAircraft) alertContent += `<p><span>ORIGINAL AIRCRAFT:</span> ${formData.originalAircraft}</p>`;
+                    if (formData.newAircraft) alertContent += `<p><span>NEW AIRCRAFT:</span> ${formData.newAircraft}</p>`;
+                    break;
+                    
+                case "INTERNATIONAL COMINGLE APPROVED":
+                    if (formData.departureGate) alertContent += `<p><span>GATE:</span> ${formData.departureGate}</p>`;
+                    if (formData.flightNumber) alertContent += `<p><span>INTERNATIONAL COMINGLE:</span> APPROVED</p>`;
+                    break;
+                    
+                case "CUSTOM":
+                    if (formData.departureGate) alertContent += `<p><span>GATE:</span> ${formData.departureGate}</p>`;
+                    break;
+            }
+            
+            // Add notes if available
+            if (formData.customNotes) {
+                alertContent += `<p><span>NOTES:</span> ${formData.customNotes}</p>`;
+            }
+            
+            // Display the alert
+            document.getElementById('output').innerHTML = `<div class="alert-details">${alertContent}</div>`;
+            document.getElementById('previewSection').classList.remove('hidden');
+            
+            // Scroll to preview
+            document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function copyToClipboard() {
+            // Get the alert header and content
+            const header = document.getElementById('alertHeader').textContent;
+            const content = document.getElementById('output').innerText;
+            const width = document.getElementById('alertWidth').value;
+            
+            // Format the text to copy (include width in a comment for technical users)
+            const textToCopy = `${header}\n\n${content}\n\n<!-- Alert width: ${width}px -->`;
+            
+            // Use clipboard API to copy text
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    alert('Alert copied to clipboard!');
+                })
+                .catch(err => {
+                    console.error('Could not copy text: ', err);
+                    alert('Failed to copy to clipboard. Please try again.');
+                });
+        }
+        
+        function resetForm() {
+            // Reset all form fields
+            const form = document.querySelectorAll('input, select');
+            form.forEach(field => {
+                if (field.type === 'date' || field.type === 'time') {
+                    // Don't reset date/time fields
+                    return;
+                }
+                field.value = '';
+            });
+            
+            // Reset alert type
+            document.getElementById('alertType').value = '';
+            
+            // Hide all conditional fields
+            handleAlertSelection();
+            
+            // Hide preview section
+            document.getElementById('previewSection').classList.add('hidden');
+        }
+    </script>
 
 </body>
 </html>
